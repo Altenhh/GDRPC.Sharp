@@ -13,7 +13,7 @@ namespace GDRPC.Sharp
         public static void Main(string[] args)
         {
             GetGdProcess(args);
-            
+
             var memory = new MemorySharp(gdProcess);
         }
 
@@ -21,7 +21,7 @@ namespace GDRPC.Sharp
         {
             if (args.Length > 0 && args[0] == "--opengd")
             {
-                ProcessStartInfo processStartInfo = new ProcessStartInfo(@"C:\Program Files (x86)\Steam\steamapps\common\Geometry Dash\GeometryDash.exe")
+                var processStartInfo = new ProcessStartInfo(@"C:\Program Files (x86)\Steam\steamapps\common\Geometry Dash\GeometryDash.exe")
                 {
                     WorkingDirectory = @"C:\Program Files (x86)\Steam\steamapps\common\Geometry Dash",
                     UseShellExecute = false
