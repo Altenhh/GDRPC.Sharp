@@ -5,4 +5,8 @@
         <TargetFramework>netcoreapp3.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="GDAPI" Version="1.1.9" />
+    </ItemGroup>
+
 </Project>
