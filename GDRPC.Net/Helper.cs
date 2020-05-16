@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GDRPC.Sharp
+namespace GDRPC.Net
 {
     public static class Helper
     {

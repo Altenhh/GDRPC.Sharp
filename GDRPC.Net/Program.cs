@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Threading;
 using Binarysharp.MemoryManagement;
-using static GDRPC.Sharp.Helper;
+using static GDRPC.Net.Helper;
 
-namespace GDRPC.Sharp
+namespace GDRPC.Net
 {
     public static class Program
     {
@@ -13,10 +13,10 @@ namespace GDRPC.Sharp
         public static void Main(string[] args)
         {
             GetGdProcess(args);
-
+            
             var memory = new MemorySharp(gdProcess);
         }
-
+        
         private static void GetGdProcess(string[] args)
         {
             if (args.Length > 0 && args[0] == "--opengd")
