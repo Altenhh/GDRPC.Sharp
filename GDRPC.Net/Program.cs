@@ -25,13 +25,15 @@ namespace GDRPC.Net
             
             Write($"Hooked onto process: {gdProcess.MainWindowTitle} ({gdProcess.Id})");
             
-            // test noclip hack
-            var on = new byte[] { 0xE9, 0x79, 0x06, 0x00, 0x00 };
-            var off = new byte[] { 0x6A, 0x14, 0x8B, 0xCB, 0xFF };
-            
-            var address = new IntPtr(0x20A23C);
-            
-            memory.Write(address, on);
+            // test level reading
+            var address = new IntPtr(0x3222D0);
+            int[] offsets = { 0x2A0 };
+
+            address = memory[address].Read<IntPtr>();
+
+            var levelByte = memory[address + offsets[0], false].Read<int>();
+
+            Write(levelByte.ToString());
         }
         
         private static void GetGdProcess(string[] args)
