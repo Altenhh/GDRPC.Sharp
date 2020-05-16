@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Binarysharp.MemoryManagement;
 using static GDRPC.Net.Helper;
 
@@ -32,6 +33,17 @@ namespace GDRPC.Net
             var address = new IntPtr(0x20A23C);
             
             memory.Write(address, on);
+            
+            var rpc = new DiscordClient();
+
+            rpc.OnReady += () =>
+            {
+                rpc.ChangeStatus(s => s.Details = "hi");
+                rpc.ChangeStatus(s => s.State = "fuck");
+            };
+
+            // will wait indefinitely
+            Task.Delay(-1);
         }
         
         private static void GetGdProcess(string[] args)
