@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Binarysharp.MemoryManagement;
 using static GDRPC.Net.Helper;
@@ -15,15 +16,26 @@ namespace GDRPC.Net
             GetGdProcess(args);
             
             var memory = new MemorySharp(gdProcess);
+
+            if (gdProcess == null)
+            {
+                Write("Failed to hook onto process", ConsoleColor.Red);
+                return;
+            }
+            
+            Write($"Hooked onto process: {gdProcess.MainWindowTitle} ({gdProcess.Id})");
+                
         }
         
         private static void GetGdProcess(string[] args)
         {
-            if (args.Length > 0 && args[0] == "--opengd")
+            if (args.Length > 0 && args.Any(a => a == "--opengd" || a == "-o"))
             {
-                var processStartInfo = new ProcessStartInfo(@"C:\Program Files (x86)\Steam\steamapps\common\Geometry Dash\GeometryDash.exe")
+                const string path = @"C:\Program Files (x86)\Steam\steamapps\common\Geometry Dash";
+
+                var processStartInfo = new ProcessStartInfo(path + @"\GeometryDash.exe")
                 {
-                    WorkingDirectory = @"C:\Program Files (x86)\Steam\steamapps\common\Geometry Dash",
+                    WorkingDirectory = path,
                     UseShellExecute = false
                 };
 
@@ -31,19 +43,16 @@ namespace GDRPC.Net
 
                 // doesn't open immediately so we will have to wait a bit
                 Thread.Sleep(TimeSpan.FromSeconds(10));
-
-                Write($"Started process: {gdProcess?.Id} (Geometry Dash)");
             }
             else
             {
                 try
                 {
                     gdProcess = Process.GetProcessesByName("GeometryDash")[0];
-                    Write($"Hooked onto process: {gdProcess.Id} ({gdProcess.MainWindowTitle})");
                 }
                 catch
                 {
-                    Write("Failed to hook onto process", ConsoleColor.Red);
+                    // ignored
                 }
             }
         }
