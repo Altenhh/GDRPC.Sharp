@@ -11,7 +11,7 @@ namespace GDRPC.Net
 
         private readonly DiscordRpcClient client;
 
-        private RichPresence presence = new RichPresence();
+        public RichPresence presence = new RichPresence();
 
         public event Action OnReady;
 
@@ -34,6 +34,10 @@ namespace GDRPC.Net
         public void ChangeStatus(Action<RichPresence> newStatus)
         {
             newStatus(presence);
+        }
+
+        public void Update()
+        {
             client.SetPresence(presence);
         }
 
