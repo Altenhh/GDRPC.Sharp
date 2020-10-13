@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,48 +13,63 @@ namespace GDRPC.Net
 {
     public static class Program
     {
+        private static AddressDictionary addresses;
+
         private static Process gdProcess;
         private static DiscordClient rpc;
         private static MemorySharp memory;
         private static Scene currentScene;
         private static LevelInfo levelInfo = new LevelInfo();
+        private static Scheduler scheduler;
 
         public static void Main(string[] args)
         {
             GetGdProcess(args);
             
-            memory = new MemorySharp(gdProcess);
-
             if (gdProcess == null)
             {
                 Write("Failed to hook onto process", ConsoleColor.Red);
                 return;
             }
-            
-            Write($"Hooked onto process: {gdProcess.MainWindowTitle} ({gdProcess.Id})");
 
+            GetAddresses();
+            Hook();
+            InitializeRPC();
+
+            while (true)
+            {
+                if (scheduler.Stopwatch.ElapsedMilliseconds < scheduler.Delay)
+                    continue;
+                
+                scheduler.Stopwatch.Restart();
+                scheduler.Pulse();
+            }
+        }
+
+        private static void GetAddresses()
+        {
+            addresses = AddressDictionary.Parse(File.ReadAllText("Addresses.txt"));
+        }
+        private static void Hook()
+        {
+            memory = new MemorySharp(gdProcess);
+            Write($"Hooked onto process: {gdProcess.MainWindowTitle} ({gdProcess.Id})");
+        }
+        private static void InitializeRPC()
+        {
             rpc = new DiscordClient();
             rpc.ChangeStatus(s => s.Assets = new Assets { LargeImageKey = "gd" });
 
-            var scheduler = new Scheduler(5000);
+            scheduler = new Scheduler(5000);
 
             rpc.OnReady += () =>
             {
                 scheduler.Add(CheckScene);
                 scheduler.Add(GetLevelInformation);
-                scheduler.Add(() => rpc.Update());
+                scheduler.Add(rpc.Update);
 
                 scheduler.Pulse();
             };
-
-            // main function loop.
-            while (true)
-            {
-                if (scheduler.stopwatch.ElapsedMilliseconds < scheduler.delay) continue;
-                
-                scheduler.stopwatch.Restart();
-                scheduler.Pulse();
-            }
         }
 
         public static void CheckScene()
@@ -105,7 +121,7 @@ namespace GDRPC.Net
                 if (length > 15)
                 {
                     var titleAddress = memory[address + 0xFC, false].Read<IntPtr>();
-                    levelInfo.Title = memory[titleAddress + 0x0, false].ReadString(Encoding.Default);
+                    levelInfo.Title = memory[titleAddress, false].ReadString(Encoding.Default);
                 }
                 else
                     levelInfo.Title = memory[address + 0xFC, false].ReadString(Encoding.Default);
@@ -188,6 +204,7 @@ namespace GDRPC.Net
         {
             if (args.Count > 0 && args.Any(a => a == "--opengd" || a == "-o"))
             {
+                // TODO: Allow custom installation paths
                 const string path = @"C:\Program Files (x86)\Steam\steamapps\common\Geometry Dash";
 
                 var processStartInfo = new ProcessStartInfo(path + @"\GeometryDash.exe")
