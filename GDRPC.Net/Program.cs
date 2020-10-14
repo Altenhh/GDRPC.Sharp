@@ -24,6 +24,8 @@ namespace GDRPC.Net
         [Obsolete]
         private static MemorySharp memory;
 
+        private static bool successfulUpdate;
+
         public static void Main(string[] args)
         {
             GetGdProcess(args);
@@ -72,7 +74,9 @@ namespace GDRPC.Net
         }
         private static void UpdateCurrentState()
         {
-            bool successfulUpdate = reader.UpdateCurrentState(out var e);
+            bool currentState = reader.UpdateCurrentState(out var e);
+            successfulUpdate = currentState;
+
             if (!successfulUpdate)
             {
                 Write(e.Message);
@@ -108,6 +112,9 @@ namespace GDRPC.Net
         }
         public static void GetLevelInformation()
         {
+            if (!successfulUpdate)
+                return;
+
             try
             {
                 rpc.ChangeStatus(s => s.Details = state.LevelInfo.ToString());
