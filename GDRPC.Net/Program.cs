@@ -11,29 +11,14 @@ namespace GDRPC.Net
 {
     public static class Program
     {
-        // Older implementation elements marked as obsolete so that they can be easily recovered if new implementation is broken
-        // If new implementation works, delete them
         private static Process gdProcess;
         private static GdReader reader;
         private static readonly GdProcessState state = new GdProcessState();
         private static DiscordClient rpc;
         private static Scheduler scheduler;
 
-        [Obsolete]
-        private static MemorySharp memory;
-
         private static bool successfulUpdate;
 
-        public static bool IsInEditor
-        {
-            get
-            {
-                var pointer = new IntPtr(0x3222D0);
-                var address = memory[pointer].Read<IntPtr>();
-
-                return memory[address, false].Read<bool>();
-            }
-        }
 
         public static void Main(string[] args)
         {

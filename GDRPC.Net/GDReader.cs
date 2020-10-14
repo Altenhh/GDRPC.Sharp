@@ -27,7 +27,7 @@ namespace GDRPC.Net
             processBaseAddress = memory[(IntPtr) BaseAddress].Read<IntPtr>();
         }
 
-        // .. Reading
+        public bool IsInEditor => Read<bool>(0x0);
 
         public void UpdateScene()
         {
@@ -106,9 +106,14 @@ namespace GDRPC.Net
         private T Read<T>(AddressEntry entry)
         {
             // TODO: Utilize the type of the entry
-            var address = ForwardAddress(processBaseAddress, entry.Offsets);
+            return Read<T>(entry.Offsets);
+        }
 
-            return memory[address + entry.Offsets[entry.Offsets.Length - 1], false].Read<T>();
+        private T Read<T>(params int[] offsets)
+        {
+            var address = ForwardAddress(processBaseAddress, offsets);
+
+            return memory[address + offsets[offsets.Length - 1], false].Read<T>();
         }
 
         private string ReadString(string addressEntryName) => ReadString(addresses[addressEntryName]);
