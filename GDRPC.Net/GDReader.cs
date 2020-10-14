@@ -123,7 +123,7 @@ namespace GDRPC.Net
         {
             // TODO: Utilize the type of the entry
             var address = ForwardAddress(processBaseAddress, entry.Offsets);
-            return memory[address + entry.Offsets.Length - 1, false].Read<T>();
+            return memory[address + entry.Offsets[entry.Offsets.Length - 1], false].Read<T>();
         }
         private string ReadString(string addressEntryName)
         {
@@ -132,7 +132,7 @@ namespace GDRPC.Net
         private string ReadString(AddressEntry entry)
         {
             var address = ForwardAddress(processBaseAddress, entry.Offsets);
-            return memory[address + entry.Offsets.Length - 1, false].ReadString(Encoding.Default);
+            return memory[address + entry.Offsets[entry.Offsets.Length - 1], false].ReadString(Encoding.Default);
         }
 
         private IntPtr ForwardAddress(IntPtr address, int[] offsets)
