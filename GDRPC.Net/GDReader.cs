@@ -44,6 +44,8 @@ namespace GDRPC.Net
         {
             exception = null;
 
+            UpdateScene();
+
             if (currentState.Scene != Scene.Play)
                 return true;
 
