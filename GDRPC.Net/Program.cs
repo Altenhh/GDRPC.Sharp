@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using DiscordRPC;
-using GDRPC.Net.Information;
 using GDRPC.Net.Memory;
+using GDRPC.Net.Scenes;
 using static GDRPC.Net.Helper;
 
 namespace GDRPC.Net
@@ -19,7 +19,6 @@ namespace GDRPC.Net
         private static Scheduler scheduler;
 
         private static bool successfulUpdate;
-
 
         public static void Main(string[] args)
         {
@@ -60,9 +59,7 @@ namespace GDRPC.Net
 
             rpc.OnReady += () =>
             {
-                //scheduler.Add(CheckScene);
                 scheduler.Add(UpdateCurrentState);
-                scheduler.Add(GetLevelInformation);
                 scheduler.Add(UpdateRpcDisplay);
                 scheduler.Add(rpc.Update);
 
@@ -76,58 +73,37 @@ namespace GDRPC.Net
             successfulUpdate = currentState;
 
             if (!successfulUpdate)
-            {
                 Write(e.Message);
-
-                // We're most definitely not in the correct scene, so let's just go back to the main menu presence.
-                rpc.ChangeStatus(s =>
-                {
-                    s.Details = string.Empty;
-                    s.State = "In menus";
-                    s.Timestamps = null;
-                });
-            }
         }
+
+        private static RpcScene currentRpcScene = new IdleScene();
 
         private static void UpdateRpcDisplay()
         {
-            if (state.Scene != Scene.Play)
+            if (successfulUpdate)
+                GetNewRpcScene();
+            else
+                // We're most definitely not in the correct scene, so let's just go back to the main menu presence.
+                currentRpcScene = new IdleScene { State = state, Client = rpc, Reader = reader };
+            
+            currentRpcScene.Pulse();
+
+            void GetNewRpcScene()
             {
-                rpc.ChangeStatus(s => s.Timestamps = null);
-            }
-        }
+                var scenes = typeof(RpcScene).Assembly.GetTypes()
+                   .Where(t => t.IsSubclassOf(typeof(RpcScene)) && !t.IsAbstract)
+                   .Select(t => (RpcScene) Activator.CreateInstance(t));
 
-        public static void GetLevelInformation()
-        {
-            if (!successfulUpdate)
-                return;
-
-            try
-            {
-                rpc.ChangeStatus(s => s.Details = state.LevelInfo.ToString());
-
-                rpc.ChangeStatus(s =>
-                    s.State =
-                        $"{state.LevelInfo.CompletionProgress}% | {GetCoinString()} Att: {state.LevelInfo.TotalAttempts:N0} | Jumps: {state.LevelInfo.Jumps:N0} | Score: {state.LevelInfo.CalculateScore():N0} ({state.LevelInfo.CalculatePerformance():N} pp)");
-
-                if (!rpc.presence.HasTimestamps())
-                    rpc.ChangeStatus(s => s.WithTimestamps(Timestamps.Now));
-
-                string GetCoinString()
+                foreach (var scene in scenes)
                 {
-                    var result = string.Empty;
+                    if (scene.Scene.All(s => s != state.Scene))
+                        continue;
 
-                    for (var i = 0; i < state.LevelInfo.MaxCoins; i++)
-                        result += state.LevelInfo.CoinsGrabbed[i] ? "C" : "-";
-
-                    if (!string.IsNullOrEmpty(result))
-                        result += " |";
-
-                    return result;
+                    currentRpcScene = scene;
+                    currentRpcScene.State = state;
+                    currentRpcScene.Client = rpc;
+                    currentRpcScene.Reader = reader;
                 }
-            }
-            catch
-            {
             }
         }
 

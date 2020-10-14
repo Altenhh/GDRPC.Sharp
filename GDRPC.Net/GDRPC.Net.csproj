@@ -49,6 +49,9 @@
     <Compile Include="Memory\GdReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scenes\IdleScene.cs" />
+    <Compile Include="Scenes\PlayScene.cs" />
+    <Compile Include="Scenes\RpcScene.cs" />
     <Compile Include="Scheduler.cs" />
   </ItemGroup>
   <ItemGroup>

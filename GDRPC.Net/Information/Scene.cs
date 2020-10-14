@@ -1,5 +1,8 @@
-﻿namespace GDRPC.Net.Information
+﻿using System;
+
+namespace GDRPC.Net.Information
 {
+    [Flags]
     public enum Scene
     {
         Unknown = -1,
