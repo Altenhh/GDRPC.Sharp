@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using Binarysharp.MemoryManagement;
 using DiscordRPC;
 using static GDRPC.Net.Helper;
 
@@ -94,18 +93,6 @@ namespace GDRPC.Net
             {
                 rpc.ChangeStatus(s => s.Timestamps = null);
             }
-        }
-
-        [Obsolete]
-        public static void CheckScene()
-        {
-            var address = new IntPtr(0x3222D0);
-            address = memory[address].Read<IntPtr>();
-
-            var sceneInt = memory[address + 0x1DC, false].Read<int>();
-            Enum.TryParse(sceneInt.ToString(), out Scene scene);
-
-            state.Scene = scene;
         }
 
         public static void GetLevelInformation()
