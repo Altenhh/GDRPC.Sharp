@@ -8,20 +8,20 @@ namespace GDRPC.Net
     public class Scheduler
     {
         private readonly Queue<Action> runQueue = new Queue<Action>();
-        public int delay;
-        public Stopwatch stopwatch = new Stopwatch();
+        public int Delay;
+        public Stopwatch Stopwatch = new Stopwatch();
 
         public Scheduler(int delay)
         {
-            this.delay = delay;
+            Delay = delay;
         }
 
         public void Pulse()
         {
-            if (!stopwatch.IsRunning)
-                stopwatch.Start();
+            if (!Stopwatch.IsRunning)
+                Stopwatch.Start();
 
-            stopwatch.Restart();
+            Stopwatch.Restart();
             Write($"Executing {runQueue.Count} tasks.", ConsoleColor.Yellow);
 
             foreach (var action in runQueue)
