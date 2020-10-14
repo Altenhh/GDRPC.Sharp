@@ -34,7 +34,7 @@ namespace GDRPC.Net.Memory
         {
             // It would be great if you could directly read the value and convert it to an enum through the function; pending test
             var sceneInt = Read<int>("Current Scene");
-            currentState.Scene = (Scene) sceneInt;
+            currentState.Scene = (GameScene) sceneInt;
         }
 
         /// <summary>Updates the current GD process state in the locally stored <seealso cref="GdProcessState" /> object. It also calls the <seealso cref="UpdateScene" /> function.</summary>
@@ -45,7 +45,7 @@ namespace GDRPC.Net.Memory
 
             UpdateScene();
 
-            if (currentState.Scene != Scene.Play)
+            if (currentState.Scene != GameScene.Play)
                 return true;
 
             try

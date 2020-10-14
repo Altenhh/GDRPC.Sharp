@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -30,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -40,16 +42,23 @@
   <ItemGroup>
     <Compile Include="DiscordClient.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="Information\GameSceneEnumConvertsionExtensions.cs" />
+    <Compile Include="Information\GameScenes.cs" />
     <Compile Include="Information\LevelInfo.cs" />
     <Compile Include="Information\LevelType.cs" />
-    <Compile Include="Information\Scene.cs" />
+    <Compile Include="Information\GameScene.cs" />
     <Compile Include="Memory\AddressDictionary.cs" />
     <Compile Include="Memory\AddressEntry.cs" />
     <Compile Include="Memory\GdProcessState.cs" />
     <Compile Include="Memory\GdReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scenes\IdleScene.cs" />
+    <Compile Include="Scenes\PlayScene.cs" />
+    <Compile Include="Scenes\RpcScene.cs" />
     <Compile Include="Scheduler.cs" />
+    <Compile Include="Utilities\FlagsEnumDictionary.cs" />
+    <Compile Include="Utilities\TypeSize.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Addresses.txt">
