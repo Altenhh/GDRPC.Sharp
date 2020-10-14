@@ -64,19 +64,6 @@ namespace GDRPC.Net
 
         private void LoadLevelInfo()
         {
-            /*if (IsInEditor)
-            {
-                var address = new IntPtr(0x3222D0);
-                address = memory[address].Read<IntPtr>();
-
-                address = memory[address + 0x168, false].Read<IntPtr>();
-                var obj = memory[address + 0x3A0, false].Read<int>();
-
-                Console.WriteLine(obj);
-                
-                return;
-            }*/
-
             var levelTitleLength = Read<int>("Level Title Length");
 
             if (levelTitleLength > 15)
@@ -108,9 +95,6 @@ namespace GDRPC.Net
                 currentState.LevelInfo.CoinsGrabbed[i] = Read<bool>($"Coin {i} Grabbed");
 
             currentState.LevelInfo.Length = Read<float>("Level Length");
-            
-            // Debugging again?
-            Console.WriteLine(Read<int>("Max Coins"));
 
             currentState.LevelInfo.Type = (LevelType)Read<int>("Level Type");
         }

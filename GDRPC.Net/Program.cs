@@ -110,10 +110,6 @@ namespace GDRPC.Net
         {
             try
             {
-                // Debugging?
-                if (state.LevelInfo.Id == 62028241)
-                    state.LevelInfo.Stars = 12;
-
                 rpc.ChangeStatus(s => s.Details = state.LevelInfo.ToString());
                 rpc.ChangeStatus(s => s.State = $"{state.LevelInfo.CompletionProgress}% | {GetCoinString()} Att: {state.LevelInfo.TotalAttempts:N0} | Jumps: {state.LevelInfo.Jumps:N0} | Score: {state.LevelInfo.CalculateScore():N0} ({state.LevelInfo.CalculatePerformance():N} pp)");
 
