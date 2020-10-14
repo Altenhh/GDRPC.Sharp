@@ -57,7 +57,6 @@
     <Compile Include="Scenes\PlayScene.cs" />
     <Compile Include="Scenes\RpcScene.cs" />
     <Compile Include="Scheduler.cs" />
-    <Compile Include="Utilities\FlagsEnumListDictionary.cs" />
     <Compile Include="Utilities\FlagsEnumDictionary.cs" />
     <Compile Include="Utilities\TypeSize.cs" />
   </ItemGroup>
