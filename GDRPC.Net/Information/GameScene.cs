@@ -1,9 +1,6 @@
-﻿using System;
-
-namespace GDRPC.Net.Information
+﻿namespace GDRPC.Net.Information
 {
-    [Flags]
-    public enum Scene
+    public enum GameScene
     {
         Unknown = -1,
         MainMenu = 0,

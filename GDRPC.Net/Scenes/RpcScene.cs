@@ -10,7 +10,7 @@ namespace GDRPC.Net.Scenes
         public DiscordClient Client { get; set; }
         public GdProcessState State { get; set; }
         // TODO: This should utilize the Flag system.
-        public abstract IEnumerable<Scene> Scene { get; }
+        public abstract IEnumerable<GameScene> Scenes { get; }
 
         public abstract void Pulse();
     }

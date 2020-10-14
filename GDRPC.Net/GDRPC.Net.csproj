@@ -40,9 +40,10 @@
   <ItemGroup>
     <Compile Include="DiscordClient.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="Information\GameScenes.cs" />
     <Compile Include="Information\LevelInfo.cs" />
     <Compile Include="Information\LevelType.cs" />
-    <Compile Include="Information\Scene.cs" />
+    <Compile Include="Information\GameScene.cs" />
     <Compile Include="Memory\AddressDictionary.cs" />
     <Compile Include="Memory\AddressEntry.cs" />
     <Compile Include="Memory\GdProcessState.cs" />

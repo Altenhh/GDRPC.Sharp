@@ -6,7 +6,7 @@ namespace GDRPC.Net.Scenes
 {
     public class PlayScene : RpcScene
     {
-        public override IEnumerable<Scene> Scene => new[] {Information.Scene.Play, Information.Scene.TheChallenge, Information.Scene.OfficialLevel};
+        public override IEnumerable<GameScene> Scenes => new[] { GameScene.Play, GameScene.TheChallenge, GameScene.OfficialLevel };
 
         public override void Pulse()
         {

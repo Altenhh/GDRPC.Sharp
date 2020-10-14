@@ -96,7 +96,7 @@ namespace GDRPC.Net
 
                 foreach (var scene in scenes)
                 {
-                    if (scene.Scene.All(s => s != state.Scene))
+                    if (scene.Scenes.All(s => s != state.Scene))
                         continue;
 
                     currentRpcScene = scene;

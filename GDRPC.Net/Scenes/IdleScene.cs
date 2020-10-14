@@ -5,7 +5,7 @@ namespace GDRPC.Net.Scenes
 {
     public class IdleScene : RpcScene
     {
-        public override IEnumerable<Scene> Scene => new[] {Information.Scene.MainMenu, Information.Scene.Unknown};
+        public override IEnumerable<GameScene> Scenes => new[] { GameScene.MainMenu, GameScene.Unknown };
 
         public override void Pulse()
         {
