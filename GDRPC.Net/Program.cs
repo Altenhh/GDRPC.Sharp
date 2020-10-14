@@ -84,26 +84,16 @@ namespace GDRPC.Net
                 GetNewRpcScene();
             else
                 // We're most definitely not in the correct scene, so let's just go back to the main menu presence.
-                currentRpcScene = new IdleScene { State = state, Client = rpc, Reader = reader };
+                currentRpcScene = new IdleScene(reader, rpc, state);
             
             currentRpcScene.Pulse();
 
             void GetNewRpcScene()
             {
-                var scenes = typeof(RpcScene).Assembly.GetTypes()
-                   .Where(t => t.IsSubclassOf(typeof(RpcScene)) && !t.IsAbstract)
-                   .Select(t => (RpcScene) Activator.CreateInstance(t));
-
-                foreach (var scene in scenes)
-                {
-                    if (scene.Scenes.All(s => s != state.Scene))
-                        continue;
-
-                    currentRpcScene = scene;
-                    currentRpcScene.State = state;
-                    currentRpcScene.Client = rpc;
-                    currentRpcScene.Reader = reader;
-                }
+                currentRpcScene = RpcScene.GetScene(state.Scene);
+                currentRpcScene.State = state;
+                currentRpcScene.Client = rpc;
+                currentRpcScene.Reader = reader;
             }
         }
 

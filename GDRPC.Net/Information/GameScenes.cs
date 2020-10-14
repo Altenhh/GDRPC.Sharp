@@ -3,9 +3,9 @@
 namespace GDRPC.Net.Information
 {
     [Flags]
-    public enum GameScenes
+    public enum GameScenes : ulong
     {
-        Unknown = 0,
+        None = 0,
         MainMenu = 1 << GameScene.MainMenu,
         Select = 1 << GameScene.Select,
         Play = 1 << GameScene.Play,
@@ -15,5 +15,7 @@ namespace GDRPC.Net.Information
         OfficialLevelListing = 1 << GameScene.OfficialLevelListing,
         OfficialLevel = 1 << GameScene.OfficialLevel,
         TheChallenge = 1 << GameScene.TheChallenge,
+
+        Unknown = 1ul << GameScene.Unknown,
     }
 }

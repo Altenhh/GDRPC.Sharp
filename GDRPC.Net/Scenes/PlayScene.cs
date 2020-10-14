@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using DiscordRPC;
 using GDRPC.Net.Information;
+using GDRPC.Net.Memory;
 
 namespace GDRPC.Net.Scenes
 {
@@ -8,16 +9,28 @@ namespace GDRPC.Net.Scenes
     {
         public override IEnumerable<GameScene> Scenes => new[] { GameScene.Play, GameScene.TheChallenge, GameScene.OfficialLevel };
 
+        public PlayScene()
+            : base()
+        {
+        }
+
+        public PlayScene(GdReader reader, DiscordClient client, GdProcessState state)
+            : base(reader, client, state)
+        {
+        }
+
         public override void Pulse()
         {
             if (!Client.presence.HasTimestamps())
                 Client.ChangeStatus(s => s.WithTimestamps(Timestamps.Now));
 
-            Client.ChangeStatus(s => s.Details = State.LevelInfo.ToString());
+            var info = State.LevelInfo;
+
+            Client.ChangeStatus(s => s.Details = info.ToString());
 
             Client.ChangeStatus(s =>
                 s.State =
-                    $"{State.LevelInfo.CompletionProgress}% | {GetCoinString()} Att: {State.LevelInfo.TotalAttempts:N0} | Jumps: {State.LevelInfo.Jumps:N0} | Score: {State.LevelInfo.CalculateScore():N0} ({State.LevelInfo.CalculatePerformance():N} pp)");
+                    $"{info.CompletionProgress}% | {GetCoinString()} Att: {info.TotalAttempts:N0} | Jumps: {info.Jumps:N0} | Score: {info.CalculateScore():N0} ({info.CalculatePerformance():N} pp)");
         }
 
         private string GetCoinString()
