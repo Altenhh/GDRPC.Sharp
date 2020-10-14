@@ -8,12 +8,8 @@ namespace GDRPC.Net
     public class DiscordClient : IDisposable
     {
         private const string client_id = "419568479172034561";
-
         private readonly DiscordRpcClient client;
-
         public RichPresence presence = new RichPresence();
-
-        public event Action OnReady;
 
         public DiscordClient()
         {
@@ -31,6 +27,13 @@ namespace GDRPC.Net
             client.Initialize();
         }
 
+        public void Dispose()
+        {
+            client.Dispose();
+        }
+
+        public event Action OnReady;
+
         public void ChangeStatus(Action<RichPresence> newStatus)
         {
             newStatus(presence);
@@ -47,11 +50,6 @@ namespace GDRPC.Net
 
             OnReady?.Invoke();
             client.SetPresence(presence);
-        }
-
-        public void Dispose()
-        {
-            client.Dispose();
         }
     }
 }

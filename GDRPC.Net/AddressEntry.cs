@@ -1,16 +1,18 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 namespace GDRPC.Net
 {
     public sealed class AddressEntry
     {
-        public string Name { get; set; }
-        public int[] Offsets { get; set; }
-        public string Type { get; set; }
+        public AddressEntry()
+        {
+        }
 
-        public AddressEntry() { }
-        public AddressEntry(string name) => Name = name;
+        public AddressEntry(string name)
+        {
+            Name = name;
+        }
+
         public AddressEntry(string name, int[] offsets, string type)
         {
             Name = name;
@@ -18,6 +20,11 @@ namespace GDRPC.Net
             Type = type;
         }
 
-        public override string ToString() => $"{Name} - {{ {string.Join(", ", Offsets.Select(o => $"0x{o:X}"))} }} - {Type}";
+        public string Name { get; set; }
+        public int[] Offsets { get; set; }
+        public string Type { get; set; }
+
+        public override string ToString() =>
+            $"{Name} - {{ {string.Join(", ", Offsets.Select(o => $"0x{o:X}"))} }} - {Type}";
     }
 }

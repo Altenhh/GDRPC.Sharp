@@ -1,10 +1,10 @@
-﻿using Binarysharp.MemoryManagement;
-using DiscordRPC;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Binarysharp.MemoryManagement;
+using DiscordRPC;
 using static GDRPC.Net.Helper;
 
 namespace GDRPC.Net
@@ -13,11 +13,9 @@ namespace GDRPC.Net
     {
         // Older implementation elements marked as obsolete so that they can be easily recovered if new implementation is broken
         // If new implementation works, delete them
-
         private static Process gdProcess;
         private static GdReader reader;
-        private static GdProcessState state = new GdProcessState();
-
+        private static readonly GdProcessState state = new GdProcessState();
         private static DiscordClient rpc;
         private static Scheduler scheduler;
 
@@ -26,13 +24,25 @@ namespace GDRPC.Net
 
         private static bool successfulUpdate;
 
+        public static bool IsInEditor
+        {
+            get
+            {
+                var pointer = new IntPtr(0x3222D0);
+                var address = memory[pointer].Read<IntPtr>();
+
+                return memory[address, false].Read<bool>();
+            }
+        }
+
         public static void Main(string[] args)
         {
             GetGdProcess(args);
-            
+
             if (gdProcess == null)
             {
                 Write("Failed to hook onto process", ConsoleColor.Red);
+
                 return;
             }
 
@@ -43,7 +53,7 @@ namespace GDRPC.Net
             {
                 if (scheduler.Stopwatch.ElapsedMilliseconds < scheduler.Delay)
                     continue;
-                
+
                 scheduler.Stopwatch.Restart();
                 scheduler.Pulse();
             }
@@ -54,10 +64,11 @@ namespace GDRPC.Net
             reader = new GdReader(gdProcess, state);
             Write($"Hooked onto process: {gdProcess.MainWindowTitle} ({gdProcess.Id})");
         }
+
         private static void InitializeRPC()
         {
             rpc = new DiscordClient();
-            rpc.ChangeStatus(s => s.Assets = new Assets { LargeImageKey = "gd" });
+            rpc.ChangeStatus(s => s.Assets = new Assets {LargeImageKey = "gd"});
 
             scheduler = new Scheduler(5000);
 
@@ -72,9 +83,10 @@ namespace GDRPC.Net
                 scheduler.Pulse();
             };
         }
+
         private static void UpdateCurrentState()
         {
-            bool currentState = reader.UpdateCurrentState(out var e);
+            var currentState = reader.UpdateCurrentState(out var e);
             successfulUpdate = currentState;
 
             if (!successfulUpdate)
@@ -90,12 +102,12 @@ namespace GDRPC.Net
                 });
             }
         }
+
         private static void UpdateRpcDisplay()
         {
             if (state.Scene != Scene.Play)
             {
                 rpc.ChangeStatus(s => s.Timestamps = null);
-                return;
             }
         }
 
@@ -110,6 +122,7 @@ namespace GDRPC.Net
 
             state.Scene = scene;
         }
+
         public static void GetLevelInformation()
         {
             if (!successfulUpdate)
@@ -118,7 +131,10 @@ namespace GDRPC.Net
             try
             {
                 rpc.ChangeStatus(s => s.Details = state.LevelInfo.ToString());
-                rpc.ChangeStatus(s => s.State = $"{state.LevelInfo.CompletionProgress}% | {GetCoinString()} Att: {state.LevelInfo.TotalAttempts:N0} | Jumps: {state.LevelInfo.Jumps:N0} | Score: {state.LevelInfo.CalculateScore():N0} ({state.LevelInfo.CalculatePerformance():N} pp)");
+
+                rpc.ChangeStatus(s =>
+                    s.State =
+                        $"{state.LevelInfo.CompletionProgress}% | {GetCoinString()} Att: {state.LevelInfo.TotalAttempts:N0} | Jumps: {state.LevelInfo.Jumps:N0} | Score: {state.LevelInfo.CalculateScore():N0} ({state.LevelInfo.CalculatePerformance():N} pp)");
 
                 if (!rpc.presence.HasTimestamps())
                     rpc.ChangeStatus(s => s.WithTimestamps(Timestamps.Now));
@@ -138,17 +154,6 @@ namespace GDRPC.Net
             }
             catch
             {
-            }
-        }
-
-        public static bool IsInEditor
-        {
-            get
-            {
-                var pointer = new IntPtr(0x3222D0);
-                var address = memory[pointer].Read<IntPtr>();
-                
-                return memory[address, false].Read<bool>();
             }
         }
 

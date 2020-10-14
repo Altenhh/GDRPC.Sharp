@@ -1,33 +1,30 @@
-﻿using Binarysharp.MemoryManagement;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using Binarysharp.MemoryManagement;
 
 namespace GDRPC.Net
 {
     public class GdReader
     {
-        private static AddressDictionary addresses;
-        
+        public const int BaseAddress = 0x3222D0;
+        private static readonly AddressDictionary addresses;
+        public readonly Process Process;
+        private readonly GdProcessState currentState;
+        private readonly MemorySharp memory;
+        private readonly IntPtr processBaseAddress;
+
         static GdReader()
         {
             addresses = AddressDictionary.Parse(File.ReadAllText("Addresses.txt"));
         }
 
-        public const int BaseAddress = 0x3222D0;
-
-        private MemorySharp memory;
-        private GdProcessState currentState;
-        private IntPtr processBaseAddress;
-
-        public readonly Process Process;
-
         public GdReader(Process process, GdProcessState state)
         {
             memory = new MemorySharp(Process = process);
             currentState = state;
-            processBaseAddress = memory[(IntPtr)BaseAddress].Read<IntPtr>();
+            processBaseAddress = memory[(IntPtr) BaseAddress].Read<IntPtr>();
         }
 
         // .. Reading
@@ -36,10 +33,11 @@ namespace GDRPC.Net
         {
             // It would be great if you could directly read the value and convert it to an enum through the function; pending test
             var sceneInt = Read<int>("Current Scene");
-            currentState.Scene = (Scene)sceneInt;
+            currentState.Scene = (Scene) sceneInt;
         }
-        /// <summary>Updates the current GD process state in the locally stored <seealso cref="GdProcessState"/> object. It also calls the <seealso cref="UpdateScene"/> function.</summary>
-        /// <returns><see langword="true"/> if the update did not encounter any errors; otherwise <see langword="false"/>.</returns>
+
+        /// <summary>Updates the current GD process state in the locally stored <seealso cref="GdProcessState" /> object. It also calls the <seealso cref="UpdateScene" /> function.</summary>
+        /// <returns><see langword="true" /> if the update did not encounter any errors; otherwise <see langword="false" />.</returns>
         public bool UpdateCurrentState(out Exception exception)
         {
             exception = null;
@@ -56,6 +54,7 @@ namespace GDRPC.Net
             catch (Exception e)
             {
                 exception = e;
+
                 return false;
             }
 
@@ -72,7 +71,9 @@ namespace GDRPC.Net
                 currentState.LevelInfo.Title = memory[titleAddress, false].ReadString(Encoding.Default);
             }
             else
+            {
                 currentState.LevelInfo.Title = ReadString("Level Title");
+            }
 
             currentState.LevelInfo.Id = Read<int>("Level ID");
             currentState.LevelInfo.Author = ReadString("Level Author");
@@ -87,41 +88,41 @@ namespace GDRPC.Net
             currentState.LevelInfo.PracticeCompletionProgress = Read<int>("Practice Completion Progress");
             currentState.LevelInfo.MaxCoins = Read<int>("Max Coins");
 
-            for (int i = 0; i < 3; i++)
-                currentState.LevelInfo.CoinsGrabbed[i] = Read<bool>($"Coin {i} Grabbed");
-
-            currentState.LevelInfo.Length = Read<float>("Level Length");
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
                 currentState.LevelInfo.CoinsGrabbed[i] = Read<bool>($"Coin {i} Grabbed");
 
             currentState.LevelInfo.Length = Read<float>("Level Length");
 
-            currentState.LevelInfo.Type = (LevelType)Read<int>("Level Type");
+            for (var i = 0; i < 3; i++)
+                currentState.LevelInfo.CoinsGrabbed[i] = Read<bool>($"Coin {i} Grabbed");
+
+            currentState.LevelInfo.Length = Read<float>("Level Length");
+
+            currentState.LevelInfo.Type = (LevelType) Read<int>("Level Type");
         }
 
-        private T Read<T>(string addressEntryName)
-        {
-            return Read<T>(addresses[addressEntryName]);
-        }
+        private T Read<T>(string addressEntryName) => Read<T>(addresses[addressEntryName]);
+
         private T Read<T>(AddressEntry entry)
         {
             // TODO: Utilize the type of the entry
             var address = ForwardAddress(processBaseAddress, entry.Offsets);
+
             return memory[address + entry.Offsets[entry.Offsets.Length - 1], false].Read<T>();
         }
-        private string ReadString(string addressEntryName)
-        {
-            return ReadString(addresses[addressEntryName]);
-        }
+
+        private string ReadString(string addressEntryName) => ReadString(addresses[addressEntryName]);
+
         private string ReadString(AddressEntry entry)
         {
             var address = ForwardAddress(processBaseAddress, entry.Offsets);
+
             return memory[address + entry.Offsets[entry.Offsets.Length - 1], false].ReadString(Encoding.Default);
         }
 
         private IntPtr ForwardAddress(IntPtr address, int[] offsets)
         {
-            for (int i = 0; i < offsets.Length - 1; i++)
+            for (var i = 0; i < offsets.Length - 1; i++)
                 address = memory[address + offsets[i], false].Read<IntPtr>();
 
             return address;

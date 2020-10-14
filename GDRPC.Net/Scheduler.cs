@@ -8,7 +8,6 @@ namespace GDRPC.Net
     public class Scheduler
     {
         private readonly Queue<Action> runQueue = new Queue<Action>();
-
         public int Delay;
         public Stopwatch Stopwatch = new Stopwatch();
 
