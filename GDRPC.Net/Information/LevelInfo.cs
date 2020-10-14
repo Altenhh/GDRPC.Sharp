@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GDRPC.Net
+namespace GDRPC.Net.Information
 {
     public class LevelInfo
     {

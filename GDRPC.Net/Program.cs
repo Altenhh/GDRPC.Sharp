@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using DiscordRPC;
+using GDRPC.Net.Information;
+using GDRPC.Net.Memory;
 using static GDRPC.Net.Helper;
 
 namespace GDRPC.Net

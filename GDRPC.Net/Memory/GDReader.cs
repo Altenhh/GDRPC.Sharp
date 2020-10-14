@@ -3,8 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Binarysharp.MemoryManagement;
+using GDRPC.Net.Information;
 
-namespace GDRPC.Net
+namespace GDRPC.Net.Memory
 {
     public class GdReader
     {

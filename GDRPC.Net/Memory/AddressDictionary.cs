@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Linq;
 
-namespace GDRPC.Net
+namespace GDRPC.Net.Memory
 {
     // Do not extend interfaces, this implementation is not intended to support generalized functions
     // For once I'm not overengineering pepega

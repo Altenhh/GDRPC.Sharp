@@ -1,4 +1,6 @@
-﻿namespace GDRPC.Net
+﻿using GDRPC.Net.Information;
+
+namespace GDRPC.Net.Memory
 {
     public class GdProcessState
     {

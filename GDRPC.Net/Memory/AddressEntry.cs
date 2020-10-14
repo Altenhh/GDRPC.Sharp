@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace GDRPC.Net
+namespace GDRPC.Net.Memory
 {
     public sealed class AddressEntry
     {

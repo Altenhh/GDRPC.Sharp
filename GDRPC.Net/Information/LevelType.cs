@@ -1,4 +1,4 @@
-﻿namespace GDRPC.Net
+﻿namespace GDRPC.Net.Information
 {
     public enum LevelType
     {
