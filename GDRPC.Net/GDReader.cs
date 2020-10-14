@@ -35,7 +35,7 @@ namespace GDRPC.Net
         public void UpdateScene()
         {
             // It would be great if you could directly read the value and convert it to an enum through the function; pending test
-            var sceneInt = Read<int>("Current Scene");
+            var sceneInt = memory[(IntPtr)BaseAddress + addresses["Current Scene"].Offsets[0], false].Read<int>();  
             currentState.Scene = (Scene)sceneInt;
         }
         /// <summary>Updates the current GD process state in the locally stored <seealso cref="GdProcessState"/> object. It also calls the <seealso cref="UpdateScene"/> function.</summary>
