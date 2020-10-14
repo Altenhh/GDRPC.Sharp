@@ -41,8 +41,8 @@
     <Compile Include="AddressDictionary.cs" />
     <Compile Include="AddressEntry.cs" />
     <Compile Include="DiscordClient.cs" />
-    <Compile Include="GDProcessState.cs" />
-    <Compile Include="GDReader.cs" />
+    <Compile Include="GdProcessState.cs" />
+    <Compile Include="GdReader.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="LevelInfo.cs" />
     <Compile Include="LevelType.cs" />

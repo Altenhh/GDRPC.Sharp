@@ -15,8 +15,8 @@ namespace GDRPC.Net
         // If new implementation works, delete them
 
         private static Process gdProcess;
-        private static GDReader reader;
-        private static GDProcessState state = new GDProcessState();
+        private static GdReader reader;
+        private static GdProcessState state = new GdProcessState();
 
         private static DiscordClient rpc;
         private static Scheduler scheduler;
@@ -49,7 +49,7 @@ namespace GDRPC.Net
 
         private static void Hook()
         {
-            reader = new GDReader(gdProcess, state);
+            reader = new GdReader(gdProcess, state);
             Write($"Hooked onto process: {gdProcess.MainWindowTitle} ({gdProcess.Id})");
         }
         private static void InitializeRPC()
@@ -64,7 +64,7 @@ namespace GDRPC.Net
                 //scheduler.Add(CheckScene);
                 scheduler.Add(UpdateCurrentState);
                 scheduler.Add(GetLevelInformation);
-                scheduler.Add(UpdateRPCDisplay);
+                scheduler.Add(UpdateRpcDisplay);
                 scheduler.Add(rpc.Update);
 
                 scheduler.Pulse();
@@ -86,7 +86,7 @@ namespace GDRPC.Net
                 });
             }
         }
-        private static void UpdateRPCDisplay()
+        private static void UpdateRpcDisplay()
         {
             if (state.Scene != Scene.Play)
             {

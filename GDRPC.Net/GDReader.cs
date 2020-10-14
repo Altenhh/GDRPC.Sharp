@@ -6,11 +6,11 @@ using System.Text;
 
 namespace GDRPC.Net
 {
-    public class GDReader
+    public class GdReader
     {
         private static AddressDictionary addresses;
         
-        static GDReader()
+        static GdReader()
         {
             addresses = AddressDictionary.Parse(File.ReadAllText("Addresses.txt"));
         }
@@ -18,12 +18,12 @@ namespace GDRPC.Net
         public const int BaseAddress = 0x3222D0;
 
         private MemorySharp memory;
-        private GDProcessState currentState;
+        private GdProcessState currentState;
         private IntPtr processBaseAddress;
 
         public readonly Process Process;
 
-        public GDReader(Process process, GDProcessState state)
+        public GdReader(Process process, GdProcessState state)
         {
             memory = new MemorySharp(Process = process);
             currentState = state;
@@ -38,7 +38,7 @@ namespace GDRPC.Net
             var sceneInt = Read<int>("Current Scene");
             currentState.Scene = (Scene)sceneInt;
         }
-        /// <summary>Updates the current GD process state in the locally stored <seealso cref="GDProcessState"/> object. It also calls the <seealso cref="UpdateScene"/> function.</summary>
+        /// <summary>Updates the current GD process state in the locally stored <seealso cref="GdProcessState"/> object. It also calls the <seealso cref="UpdateScene"/> function.</summary>
         /// <returns><see langword="true"/> if the update did not encounter any errors; otherwise <see langword="false"/>.</returns>
         public bool UpdateCurrentState(out Exception exception)
         {
