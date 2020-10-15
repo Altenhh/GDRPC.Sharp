@@ -2,7 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using Binarysharp.MemoryManagement;
+using BlueRain;
+using BlueRain.Common;
 using GDRPC.Net.Information;
 
 namespace GDRPC.Net.Memory
@@ -13,7 +14,7 @@ namespace GDRPC.Net.Memory
         private static readonly AddressDictionary addresses;
         public readonly Process Process;
         private readonly GdProcessState currentState;
-        private readonly MemorySharp memory;
+        private readonly BlueRain.ExternalProcessMemory memory;
         private readonly IntPtr processBaseAddress;
 
         static GdReader()
@@ -23,9 +24,9 @@ namespace GDRPC.Net.Memory
 
         public GdReader(Process process, GdProcessState state)
         {
-            memory = new MemorySharp(Process = process);
+            memory = new ExternalProcessMemory(Process = process);
             currentState = state;
-            processBaseAddress = memory[(IntPtr) BaseAddress].Read<IntPtr>();
+            processBaseAddress = memory.Read<IntPtr>((IntPtr) BaseAddress, true);
         }
 
         public bool IsInEditor => Read<bool>(0x0);
@@ -69,7 +70,7 @@ namespace GDRPC.Net.Memory
             if (levelTitleLength > 15)
             {
                 var titleAddress = Read<IntPtr>("Level Title");
-                currentState.LevelInfo.Title = memory[titleAddress, false].ReadString(Encoding.Default);
+                currentState.LevelInfo.Title = memory.ReadString(titleAddress, Encoding.Default);
             }
             else
             {
@@ -102,19 +103,25 @@ namespace GDRPC.Net.Memory
             currentState.LevelInfo.Type = (LevelType) Read<int>("Level Type");
         }
 
-        private T Read<T>(string addressEntryName) => Read<T>(addresses[addressEntryName]);
+        private T Read<T>(string addressEntryName)
+            where T : struct
+        {
+            return Read<T>(addresses[addressEntryName]);
+        }
 
         private T Read<T>(AddressEntry entry)
+            where T : struct
         {
             // TODO: Utilize the type of the entry
             return Read<T>(entry.Offsets);
         }
 
         private T Read<T>(params int[] offsets)
+            where T : struct
         {
             var address = ForwardAddress(processBaseAddress, offsets);
 
-            return memory[address + offsets[offsets.Length - 1], false].Read<T>();
+            return memory.Read<T>(address + offsets[offsets.Length - 1]);
         }
 
         private string ReadString(string addressEntryName) => ReadString(addresses[addressEntryName]);
@@ -123,13 +130,13 @@ namespace GDRPC.Net.Memory
         {
             var address = ForwardAddress(processBaseAddress, entry.Offsets);
 
-            return memory[address + entry.Offsets[entry.Offsets.Length - 1], false].ReadString(Encoding.Default);
+            return memory.ReadString(address + entry.Offsets[entry.Offsets.Length - 1], Encoding.Default);
         }
 
         private IntPtr ForwardAddress(IntPtr address, int[] offsets)
         {
             for (var i = 0; i < offsets.Length - 1; i++)
-                address = memory[address + offsets[i], false].Read<IntPtr>();
+                address = memory.Read<IntPtr>(address + offsets[i]);
 
             return address;
         }
