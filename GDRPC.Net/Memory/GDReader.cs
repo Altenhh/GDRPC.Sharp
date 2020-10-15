@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using BlueRain;
-using BlueRain.Common;
 using GDRPC.Net.Information;
 
 namespace GDRPC.Net.Memory
@@ -14,7 +13,7 @@ namespace GDRPC.Net.Memory
         private static readonly AddressDictionary addresses;
         public readonly Process Process;
         private readonly GdProcessState currentState;
-        private readonly BlueRain.ExternalProcessMemory memory;
+        private readonly ExternalProcessMemory memory;
         private readonly IntPtr processBaseAddress;
 
         static GdReader()
@@ -121,7 +120,7 @@ namespace GDRPC.Net.Memory
         {
             var address = ForwardAddress(processBaseAddress, offsets);
 
-            return memory.Read<T>(address + offsets[offsets.Length - 1]);
+            return memory.Read<T>(address + offsets[^1]);
         }
 
         private string ReadString(string addressEntryName) => ReadString(addresses[addressEntryName]);
@@ -130,7 +129,7 @@ namespace GDRPC.Net.Memory
         {
             var address = ForwardAddress(processBaseAddress, entry.Offsets);
 
-            return memory.ReadString(address + entry.Offsets[entry.Offsets.Length - 1], Encoding.Default);
+            return memory.ReadString(address + entry.Offsets[^1], Encoding.Default);
         }
 
         private IntPtr ForwardAddress(IntPtr address, int[] offsets)
