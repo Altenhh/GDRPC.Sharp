@@ -19,7 +19,6 @@ namespace GDRPC.Net.Memory
         public static AddressDictionary Parse(string contents)
         {
             // Too lazy to import the Garyon extension for splitting lines
-            // And why the fuck are we not using .NET Core?
             var lines = contents.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
             var result = new AddressDictionary();
@@ -27,10 +26,10 @@ namespace GDRPC.Net.Memory
 
             foreach (var line in lines)
             {
-                if (line.StartsWith("#"))
+                if (line.StartsWith('#'))
                     continue;
 
-                if (line.Length == 0)
+                if (!line.Any())
                 {
                     result.Add(currentEntry);
                     currentEntry = null;
@@ -38,10 +37,10 @@ namespace GDRPC.Net.Memory
                     continue;
                 }
 
-                if (line.StartsWith("["))
+                if (line.StartsWith('['))
                 {
                     // New entry registration
-                    currentEntry = new AddressEntry(line.Substring(1, line.Length - 2).Trim());
+                    currentEntry = new AddressEntry(line[1..^1].Trim());
 
                     continue;
                 }

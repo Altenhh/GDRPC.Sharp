@@ -88,7 +88,7 @@ namespace GDRPC.Net
             
             currentRpcScene.Pulse();
 
-            void GetNewRpcScene()
+            static void GetNewRpcScene()
             {
                 currentRpcScene = RpcScene.GetScene(state.Scene);
                 currentRpcScene.State = state;
