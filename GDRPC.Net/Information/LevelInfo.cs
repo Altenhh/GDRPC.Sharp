@@ -37,11 +37,12 @@ namespace GDRPC.Net.Information
             return $" (ID: {Id})";
         }
 
+        // Scorev2 pog
         public int CalculateScore() =>
-            (int) (Stars * CompletionProgress * Math.Pow(Length, 0.75f));
+            (int) (Math.Pow(Math.Pow(CompletionProgress / 100d, 1 + (CalculateDifficulty() / 14d) * 0.5d), 1 - ((Math.Log10(Length) - 5) * 0.1)) * 1_000_000);
 
         public double CalculatePerformance() =>
-            Stars * (CompletionProgress * 0.01) * Math.Pow(Length, Stars / 40d);
+            Math.Pow(Math.Pow(CalculateDifficulty() / 14d, 0.4d) * (CalculateScore() / 1_000_000d) * Math.Pow(Length, CalculateDifficulty() / 21d), 1.2d);
 
         public int CalculateDifficulty()
         {
