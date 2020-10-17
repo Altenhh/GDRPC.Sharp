@@ -4,16 +4,16 @@ using GDRPC.Net.Memory;
 
 namespace GDRPC.Net.Scenes
 {
-    public class IdleScene : RpcScene
+    public class UnknownScene : RpcScene
     {
-        public override IEnumerable<GameScene> Scenes => new[] { GameScene.MainMenu };
+        public override IEnumerable<GameScene> Scenes => new[] { GameScene.Unknown };
 
-        public IdleScene()
+        public UnknownScene()
             : base()
         {
         }
 
-        public IdleScene(GdReader reader, DiscordClient client, GdProcessState state)
+        public UnknownScene(GdReader reader, DiscordClient client, GdProcessState state)
             : base(reader, client, state)
         {
         }
@@ -23,7 +23,7 @@ namespace GDRPC.Net.Scenes
             Client.ChangeStatus(s =>
             {
                 s.Details = string.Empty;
-                s.State = "In menus";
+                s.State = "Unknown state";
                 s.Timestamps = null;
             });
         }
