@@ -20,7 +20,22 @@ namespace GDRPC.Net.Information
         public float Length { get; set; }
         public bool[] CoinsGrabbed { get; set; } = new bool[3];
         public LevelType Type { get; set; }
-        public override string ToString() => $"{Title} - {Author} [{CalculateDifficulty()}*]";
+        public override string ToString() => $"{Title} - {Author}{GetDifficultyString()}{GetIdString()}";
+
+        private string GetDifficultyString()
+        {
+            var difficulty = CalculateDifficulty();
+            if (difficulty == 0)
+                return string.Empty;
+            return $" [{difficulty}*]";
+        }
+
+        private string GetIdString()
+        {
+            if (Id == 0)
+                return " (Local level)";
+            return $" (ID: {Id})";
+        }
 
         public int CalculateScore() =>
             (int) (Stars * CompletionProgress * Math.Pow(Length, 0.75f));
@@ -33,7 +48,8 @@ namespace GDRPC.Net.Information
             if (Auto)
                 return 0;
 
-            if (!Demon) return Stars;
+            if (!Demon)
+                return Stars;
 
             switch (DemonDifficulty)
             {
