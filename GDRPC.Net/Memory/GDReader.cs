@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using BlueRain;
 using GDRPC.Net.Information;
+using ProcessMemory = MemorySharp.Core.MemorySharp;
 
 namespace GDRPC.Net.Memory
 {
@@ -13,7 +13,7 @@ namespace GDRPC.Net.Memory
         private static readonly AddressDictionary addresses;
         public readonly Process Process;
         private readonly GdProcessState currentState;
-        private readonly ExternalProcessMemory memory;
+        private readonly ProcessMemory memory;
         private readonly IntPtr processBaseAddress;
 
         static GdReader()
@@ -23,7 +23,7 @@ namespace GDRPC.Net.Memory
 
         public GdReader(Process process, GdProcessState state)
         {
-            memory = new ExternalProcessMemory(Process = process);
+            memory = new ProcessMemory(Process = process);
             currentState = state;
             processBaseAddress = memory.Read<IntPtr>((IntPtr) BaseAddress, true);
         }
@@ -32,9 +32,8 @@ namespace GDRPC.Net.Memory
 
         public void UpdateScene()
         {
-            // It would be great if you could directly read the value and convert it to an enum through the function; pending test
-            var sceneInt = Read<int>("Current Scene");
-            currentState.Scene = (GameScene) sceneInt;
+            // Cannot directly read enum types
+            currentState.Scene = (GameScene) Read<int>("Current Scene");
         }
 
         /// <summary>Updates the current GD process state in the locally stored <seealso cref="GdProcessState" /> object. It also calls the <seealso cref="UpdateScene" /> function.</summary>
@@ -120,7 +119,7 @@ namespace GDRPC.Net.Memory
         {
             var address = ForwardAddress(processBaseAddress, offsets);
 
-            return memory.Read<T>(address + offsets[^1]);
+            return memory.Read<T>(address + offsets[^1], false);
         }
 
         private string ReadString(string addressEntryName) => ReadString(addresses[addressEntryName]);
@@ -129,13 +128,13 @@ namespace GDRPC.Net.Memory
         {
             var address = ForwardAddress(processBaseAddress, entry.Offsets);
 
-            return memory.ReadString(address + entry.Offsets[^1], Encoding.Default);
+            return memory.ReadString(address + entry.Offsets[^1], Encoding.Default, false);
         }
 
         private IntPtr ForwardAddress(IntPtr address, int[] offsets)
         {
             for (var i = 0; i < offsets.Length - 1; i++)
-                address = memory.Read<IntPtr>(address + offsets[i]);
+                address = memory.Read<IntPtr>(address + offsets[i], false);
 
             return address;
         }

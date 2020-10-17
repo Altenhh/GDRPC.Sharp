@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Addresses.txt">
@@ -11,9 +12,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="BlueRain" Version="2.0.0" />
     <PackageReference Include="DiscordRichPresence" Version="1.143.0" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MemorySharp.Core">
+      <HintPath>ResourceLibraries\MemorySharp.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
