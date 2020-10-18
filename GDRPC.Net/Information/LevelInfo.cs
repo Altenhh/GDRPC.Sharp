@@ -20,20 +20,37 @@ namespace GDRPC.Net.Information
         public float Length { get; set; }
         public bool[] CoinsGrabbed { get; set; } = new bool[3];
         public LevelType Type { get; set; }
-        public override string ToString() => $"{Title} - {Author} [{CalculateDifficulty()}*]";
+        public override string ToString() => $"{Title} - {Author}{GetDifficultyString()}{GetIdString()}";
 
+        private string GetDifficultyString()
+        {
+            var difficulty = CalculateDifficulty();
+            if (difficulty == 0)
+                return string.Empty;
+            return $" [{difficulty}*]";
+        }
+
+        private string GetIdString()
+        {
+            if (Id == 0)
+                return " (Local level)";
+            return $" (ID: {Id})";
+        }
+
+        // Scorev2 pog
         public int CalculateScore() =>
-            (int) (Stars * CompletionProgress * Math.Pow(Length, 0.75f));
+            (int) (Math.Pow(Math.Pow(CompletionProgress / 100d, 1 + (CalculateDifficulty() / 14d) * 0.5d), 1 - ((Math.Log10(Length) - 5) * 0.1)) * 1_000_000);
 
         public double CalculatePerformance() =>
-            Stars * (CompletionProgress * 0.01) * Math.Pow(Length, Stars / 40d);
+            Math.Pow(Math.Pow(CalculateDifficulty() / 14d, 0.4d) * (CalculateScore() / 1_000_000d) * Math.Pow(Length, CalculateDifficulty() / 21d), 1.2d);
 
         public int CalculateDifficulty()
         {
             if (Auto)
                 return 0;
 
-            if (!Demon) return Stars;
+            if (!Demon)
+                return Stars;
 
             return DemonDifficulty switch
             {
