@@ -22,7 +22,7 @@ namespace GDRPC.Net.Utilities
             RegisterSize<float>();
             RegisterSize<double>();
 
-            unsafe void RegisterSize<T>()
+            static unsafe void RegisterSize<T>()
                 where T : unmanaged
             {
                 sizes.Add(typeof(T), sizeof(T));

@@ -35,23 +35,14 @@ namespace GDRPC.Net.Information
 
             if (!Demon) return Stars;
 
-            switch (DemonDifficulty)
+            return DemonDifficulty switch
             {
-                case 3:
-                    return 10;
-
-                case 4:
-                    return 11;
-
-                case 5:
-                    return 13;
-
-                case 6:
-                    return 14;
-
-                default:
-                    return 12;
-            }
+                3 => 10,
+                4 => 11,
+                5 => 13,
+                6 => 14,
+                _ => 12,
+            };
         }
     }
 }

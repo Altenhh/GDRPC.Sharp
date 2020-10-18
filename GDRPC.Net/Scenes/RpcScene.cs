@@ -55,6 +55,12 @@ namespace GDRPC.Net.Scenes
         public abstract void Pulse();
 
         public static RpcScene GetScene(GameScene scene) => GetScene(scene.ToFlags());
-        public static RpcScene GetScene(GameScenes scene) => sceneConstructors[sceneTypesDictionary[scene]].Invoke(Array.Empty<object>()) as RpcScene;
+        public static RpcScene GetScene(GameScenes scene)
+        {
+            var type = sceneTypesDictionary[scene];
+            if (type == null)
+                type = sceneTypesDictionary[GameScenes.Unknown];
+            return sceneConstructors[type].Invoke(Array.Empty<object>()) as RpcScene;
+        }
     }
 }

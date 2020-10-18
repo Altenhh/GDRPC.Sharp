@@ -55,7 +55,7 @@ namespace GDRPC.Net
             rpc = new DiscordClient();
             rpc.ChangeStatus(s => s.Assets = new Assets {LargeImageKey = "gd"});
 
-            scheduler = new Scheduler(5000);
+            scheduler = new Scheduler(2000);
 
             rpc.OnReady += () =>
             {
@@ -88,7 +88,7 @@ namespace GDRPC.Net
             
             currentRpcScene.Pulse();
 
-            void GetNewRpcScene()
+            static void GetNewRpcScene()
             {
                 currentRpcScene = RpcScene.GetScene(state.Scene);
                 currentRpcScene.State = state;
