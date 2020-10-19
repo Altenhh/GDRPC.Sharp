@@ -82,6 +82,8 @@ namespace GDRPC.Net
         {
             if (successfulUpdate)
                 GetNewRpcScene();
+            else if (reader.IsInEditor)
+                currentRpcScene = new EditorScene(reader, rpc, state);
             else
                 // We're most definitely not in the correct scene, so let's just go back to the main menu presence.
                 currentRpcScene = new IdleScene(reader, rpc, state);
