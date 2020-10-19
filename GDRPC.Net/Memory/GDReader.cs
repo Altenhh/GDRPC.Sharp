@@ -28,7 +28,7 @@ namespace GDRPC.Net.Memory
             processBaseAddress = memory.Read<IntPtr>((IntPtr) BaseAddress, true);
         }
 
-        public bool IsInEditor => Read<bool>(0x0);
+        public bool IsInEditor => Read<bool>("Is in Editor");
 
         public void UpdateScene()
         {
@@ -101,20 +101,20 @@ namespace GDRPC.Net.Memory
             currentState.LevelInfo.Type = (LevelType) Read<int>("Level Type");
         }
 
-        private T Read<T>(string addressEntryName)
+        public T Read<T>(string addressEntryName)
             where T : struct
         {
             return Read<T>(addresses[addressEntryName]);
         }
 
-        private T Read<T>(AddressEntry entry)
+        public T Read<T>(AddressEntry entry)
             where T : struct
         {
             // TODO: Utilize the type of the entry
             return Read<T>(entry.Offsets);
         }
 
-        private T Read<T>(params int[] offsets)
+        public T Read<T>(params int[] offsets)
             where T : struct
         {
             var address = ForwardAddress(processBaseAddress, offsets);
@@ -122,13 +122,20 @@ namespace GDRPC.Net.Memory
             return memory.Read<T>(address + offsets[^1], false);
         }
 
-        private string ReadString(string addressEntryName) => ReadString(addresses[addressEntryName]);
+        public string ReadString(string addressEntryName) => ReadString(addresses[addressEntryName]);
 
-        private string ReadString(AddressEntry entry)
+        public string ReadString(AddressEntry entry)
         {
             var address = ForwardAddress(processBaseAddress, entry.Offsets);
 
             return memory.ReadString(address + entry.Offsets[^1], Encoding.Default, false);
+        }
+
+        public string ReadString(params int[] offsets)
+        {
+            var address = ForwardAddress(processBaseAddress, offsets);
+
+            return memory.ReadString(address + offsets[^1], Encoding.Default, false);
         }
 
         private IntPtr ForwardAddress(IntPtr address, int[] offsets)

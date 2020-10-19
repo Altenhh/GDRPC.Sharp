@@ -81,3 +81,7 @@ valueType: int
 [Level Length]
 offsets: 0x164 | 0x3B4
 valueType: float
+
+[Is in Editor]
+offsets: 0x168
+valueType: bool
