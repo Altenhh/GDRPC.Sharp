@@ -30,7 +30,7 @@ namespace GDRPC.Net.Scenes
 
             Client.ChangeStatus(s =>
                 s.State =
-                    $"{info.CompletionProgress}% | {GetCoinString()} Att: {info.TotalAttempts:N0} | Jumps: {info.Jumps:N0} | Score: {info.CalculateScore():N0} ({info.CalculatePerformance():N} pp)");
+                    $"{info.CompletionProgress}% | {GetCoinString()} Score: {info.CalculateScore():N0} ({info.CalculatePerformance():N} pp)");
         }
 
         private string GetCoinString()

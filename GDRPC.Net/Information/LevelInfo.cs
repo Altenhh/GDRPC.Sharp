@@ -41,9 +41,16 @@ namespace GDRPC.Net.Information
         }
 
         // Scorev2 pog
-        public int CalculateScore() =>
-            (int) (Math.Pow(Math.Pow(CompletionProgress / 100d, 1 + (CalculateDifficulty() / 14d) * 0.5d),
-                       1 - ((Math.Log10(Length) - 5) * 0.1)) * 1_000_000);
+        public int CalculateScore()
+        {
+            var res = (Math.Pow(Math.Pow(CompletionProgress / 100d, 1 + (CalculateDifficulty() / 14d) * 0.5d),
+                                 1 - ((Math.Log10(Length) - 5) * 0.1)) * 1_000_000);
+            
+            // jump bonus
+            res += Math.Pow(Jumps, 1.1f);
+
+            return (int)res;
+        }
 
         public double CalculatePerformance()
         {
@@ -70,12 +77,16 @@ namespace GDRPC.Net.Information
             Console.WriteLine("high: " + Math.Pow(TotalAttempts, -((TotalAttempts * 0.85) / 1e7)) * 0.7);
 
             res *= attemptPenalty;
-            
+
             Console.WriteLine("total: " + res);
 
             if (CompletionProgress >= 100)
                 res *= 1.05f;
-            
+
+            foreach (var coin in CoinsGrabbed)
+                if (coin)
+                    res *= (.1 / MaxCoins) + 1; // should at least have 1.1 bonus max.
+
             return res;
         }
 
