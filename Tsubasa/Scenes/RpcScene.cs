@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using GDRPC.Net.Information;
-using GDRPC.Net.Memory;
-using GDRPC.Net.Utilities;
+using Tsubasa.Information;
+using Tsubasa.Memory;
+using Tsubasa.Utilities;
 
-namespace GDRPC.Net.Scenes
+namespace Tsubasa.Scenes
 {
     public abstract class RpcScene
     {

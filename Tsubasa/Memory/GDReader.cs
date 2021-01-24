@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using GDRPC.Net.Information;
-using ProcessMemory = MemorySharp.Core.MemorySharp;
+using Tsubasa.Information;
+using ProcessMemory = Binarysharp.MemoryManagement.MemorySharp;
 
-namespace GDRPC.Net.Memory
+namespace Tsubasa.Memory
 {
     public class GdReader
     {

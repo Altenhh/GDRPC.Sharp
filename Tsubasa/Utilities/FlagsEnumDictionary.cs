@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace GDRPC.Net.Utilities
+namespace Tsubasa.Utilities
 {
     public class FlagsEnumDictionary<TKey, TValue>
         where TKey : unmanaged, Enum

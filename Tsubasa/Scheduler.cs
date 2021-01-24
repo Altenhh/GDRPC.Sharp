@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using static GDRPC.Net.Helper;
+using static Tsubasa.Helper;
 
-namespace GDRPC.Net
+namespace Tsubasa
 {
     public class Scheduler
     {

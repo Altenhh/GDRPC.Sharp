@@ -1,4 +1,4 @@
-﻿namespace GDRPC.Net.Information
+﻿namespace Tsubasa.Information
 {
     public static class GameSceneEnumConvertsionExtensions
     {

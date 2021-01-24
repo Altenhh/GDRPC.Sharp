@@ -1,6 +1,6 @@
-﻿using GDRPC.Net.Information;
+﻿using Tsubasa.Information;
 
-namespace GDRPC.Net.Memory
+namespace Tsubasa.Memory
 {
     public class GdProcessState
     {

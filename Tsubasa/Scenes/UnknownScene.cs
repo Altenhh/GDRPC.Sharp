@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using GDRPC.Net.Information;
-using GDRPC.Net.Memory;
+using Tsubasa.Information;
+using Tsubasa.Memory;
 
-namespace GDRPC.Net.Scenes
+namespace Tsubasa.Scenes
 {
     public class UnknownScene : RpcScene
     {

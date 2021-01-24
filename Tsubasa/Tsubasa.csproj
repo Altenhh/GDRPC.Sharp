@@ -14,11 +14,7 @@
   <ItemGroup>
     <PackageReference Include="DiscordRichPresence" Version="1.143.0" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
+    <PackageReference Include="MemorySharp" Version="1.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="MemorySharp.Core">
-      <HintPath>ResourceLibraries\MemorySharp.Core.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>

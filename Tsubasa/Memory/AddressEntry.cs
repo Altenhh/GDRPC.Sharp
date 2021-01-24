@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace GDRPC.Net.Memory
+namespace Tsubasa.Memory
 {
     public sealed class AddressEntry
     {

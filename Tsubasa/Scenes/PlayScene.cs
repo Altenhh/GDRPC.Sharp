@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using DiscordRPC;
-using GDRPC.Net.Information;
-using GDRPC.Net.Memory;
+using Tsubasa.Information;
+using Tsubasa.Memory;
 
-namespace GDRPC.Net.Scenes
+namespace Tsubasa.Scenes
 {
     public class PlayScene : RpcScene
     {

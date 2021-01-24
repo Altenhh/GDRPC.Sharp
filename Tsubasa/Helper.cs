@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GDRPC.Net
+namespace Tsubasa
 {
     public static class Helper
     {

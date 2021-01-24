@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GDRPC.Net.Utilities
+namespace Tsubasa.Utilities
 {
     public static class TypeSize
     {

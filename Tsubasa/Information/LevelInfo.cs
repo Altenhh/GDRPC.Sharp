@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GDRPC.Net.Information
+namespace Tsubasa.Information
 {
     public class LevelInfo
     {

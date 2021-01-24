@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using DiscordRPC;
-using GDRPC.Net.Memory;
-using GDRPC.Net.Scenes;
-using static GDRPC.Net.Helper;
+using Tsubasa.Memory;
+using Tsubasa.Scenes;
+using static Tsubasa.Helper;
 
-namespace GDRPC.Net
+namespace Tsubasa
 {
     public static class Program
     {

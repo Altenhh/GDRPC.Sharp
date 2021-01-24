@@ -1,9 +1,9 @@
 ﻿using System;
 using DiscordRPC;
 using DiscordRPC.Message;
-using static GDRPC.Net.Helper;
+using static Tsubasa.Helper;
 
-namespace GDRPC.Net
+namespace Tsubasa
 {
     public class DiscordClient : IDisposable
     {
