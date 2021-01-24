@@ -25,8 +25,10 @@ namespace GDRPC.Net.Information
         private string GetDifficultyString()
         {
             var difficulty = CalculateDifficulty();
+
             if (difficulty == 0)
                 return string.Empty;
+
             return $" [{difficulty}*]";
         }
 
@@ -34,15 +36,48 @@ namespace GDRPC.Net.Information
         {
             if (Id == 0)
                 return " (Local level)";
+
             return $" (ID: {Id})";
         }
 
         // Scorev2 pog
         public int CalculateScore() =>
-            (int) (Math.Pow(Math.Pow(CompletionProgress / 100d, 1 + (CalculateDifficulty() / 14d) * 0.5d), 1 - ((Math.Log10(Length) - 5) * 0.1)) * 1_000_000);
+            (int) (Math.Pow(Math.Pow(CompletionProgress / 100d, 1 + (CalculateDifficulty() / 14d) * 0.5d),
+                       1 - ((Math.Log10(Length) - 5) * 0.1)) * 1_000_000);
 
-        public double CalculatePerformance() =>
-            Math.Pow(Math.Pow(CalculateDifficulty() / 14d, 0.4d) * (CalculateScore() / 1_000_000d) * Math.Pow(Length, CalculateDifficulty() / 21d), 1.2d);
+        public double CalculatePerformance()
+        {
+            Console.WriteLine("Difficulty: " + CalculateDifficulty());
+            Console.WriteLine("Score: " + CalculateScore());
+            Console.WriteLine("Length: " + Length);
+
+            var res = Math.Pow(
+                Math.Pow(CalculateDifficulty() / 14d, 0.4d) * (CalculateScore() / 1_000_000d) *
+                Math.Pow(Length, CalculateDifficulty() / 25d), 1.2d);
+
+            if (Demon)
+                res += Math.Pow(DemonDifficulty * (CompletionProgress / 100), 1.15f);
+
+            double attemptPenalty;
+
+            if (Demon && TotalAttempts < (500 * DemonDifficulty))
+                attemptPenalty = Math.Pow(TotalAttempts, -((TotalAttempts * 0.75) / 1e7)); // demon, low attempts
+            else
+                attemptPenalty = Math.Pow(TotalAttempts, -((TotalAttempts * 0.85) / 1e7)) * 0.7; // everything else
+
+            Console.WriteLine("res: " + res);
+            Console.WriteLine("low: " + Math.Pow(TotalAttempts, -((TotalAttempts * 0.75) / 1e7)));
+            Console.WriteLine("high: " + Math.Pow(TotalAttempts, -((TotalAttempts * 0.85) / 1e7)) * 0.7);
+
+            res *= attemptPenalty;
+            
+            Console.WriteLine("total: " + res);
+
+            if (CompletionProgress >= 100)
+                res *= 1.05f;
+            
+            return res;
+        }
 
         public int CalculateDifficulty()
         {
