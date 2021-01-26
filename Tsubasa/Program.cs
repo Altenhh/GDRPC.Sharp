@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using DiscordRPC;
 using Tsubasa.Memory;
+using Tsubasa.Online;
 using Tsubasa.Scenes;
 using static Tsubasa.Helper;
 
@@ -17,10 +20,10 @@ namespace Tsubasa
         private static readonly GdProcessState state = new GdProcessState();
         private static DiscordClient rpc;
         private static Scheduler scheduler;
-
+        private static TcpClient client;
         private static bool successfulUpdate;
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GetGdProcess(args);
 
@@ -32,7 +35,8 @@ namespace Tsubasa
             }
 
             Hook();
-            InitializeRPC();
+            InitializeRpc();
+            await InitializeServer();
 
             while (true)
             {
@@ -44,16 +48,63 @@ namespace Tsubasa
             }
         }
 
+        private static async Task InitializeServer()
+        {
+            await ConnectToTcpServer();
+            SendTestPacket();
+        }
+
+        private static async Task ConnectToTcpServer()
+        {
+            try
+            {
+                client = new TcpClient();
+                Write("Connecting to Tcp server...");
+
+                await client.ConnectAsync("207.244.229.86", 6967);
+
+                Write("Connected!", ConsoleColor.Green);
+            }
+            catch (Exception e)
+            {
+                Write(e.Message, ConsoleColor.Red);
+                Write("Continuing without server...", ConsoleColor.Red);
+            }
+        }
+
+        private static void SendTestPacket()
+        {
+            if (client.Connected)
+            {
+                var packet = new Packet();
+                var stream = client.GetStream();
+                var rng = new Random();
+
+                // set id
+                packet.Id = 10;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    packet.Write<int>(rng.Next(int.MaxValue));
+                }
+
+                // pack thing
+                var packedpacketedpacket = packet.Pack();
+
+                stream.Write(packedpacketedpacket, 0, packedpacketedpacket.Length);
+            }
+        }
+
         private static void Hook()
         {
             reader = new GdReader(gdProcess, state);
             Write($"Hooked onto process: {gdProcess.MainWindowTitle} ({gdProcess.Id})");
         }
 
-        private static void InitializeRPC()
+        private static void InitializeRpc()
         {
             rpc = new DiscordClient();
-            rpc.ChangeStatus(s => s.Assets = new Assets {LargeImageKey = "gd"});
+            rpc.ChangeStatus(s => s.Assets = new Assets { LargeImageKey = "gd" });
 
             scheduler = new Scheduler(2000);
 
@@ -94,6 +145,8 @@ namespace Tsubasa
                 currentRpcScene.State = state;
                 currentRpcScene.Client = rpc;
                 currentRpcScene.Reader = reader;
+                
+                Write($"Switched scene to: {currentRpcScene.State.Scene}", ConsoleColor.Blue);
             }
         }
 

@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tsubasa", "Tsubasa\Tsubasa.csproj", "{EA0E0992-E4C4-4677-9BCD-3C04B40402F6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tsubasa.Tests", "Tsubasa.Tests\Tsubasa.Tests.csproj", "{5FCB0F11-1494-4A11-8A99-A0ADB7453DB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,6 +17,10 @@ Global
 		{EA0E0992-E4C4-4677-9BCD-3C04B40402F6}.Debug|x86.Build.0 = Debug|x86
 		{EA0E0992-E4C4-4677-9BCD-3C04B40402F6}.Release|x86.ActiveCfg = Release|x86
 		{EA0E0992-E4C4-4677-9BCD-3C04B40402F6}.Release|x86.Build.0 = Release|x86
+		{5FCB0F11-1494-4A11-8A99-A0ADB7453DB6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5FCB0F11-1494-4A11-8A99-A0ADB7453DB6}.Debug|x86.Build.0 = Debug|Any CPU
+		{5FCB0F11-1494-4A11-8A99-A0ADB7453DB6}.Release|x86.ActiveCfg = Release|Any CPU
+		{5FCB0F11-1494-4A11-8A99-A0ADB7453DB6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

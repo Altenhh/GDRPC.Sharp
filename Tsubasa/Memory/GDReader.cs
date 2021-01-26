@@ -10,6 +10,7 @@ namespace Tsubasa.Memory
     public class GdReader
     {
         public const int BaseAddress = 0x3222D0;
+        public GdProcessState PreviousState;
         private static readonly AddressDictionary addresses;
         public readonly Process Process;
         private readonly GdProcessState currentState;
@@ -42,6 +43,7 @@ namespace Tsubasa.Memory
         {
             exception = null;
 
+            PreviousState = currentState;
             UpdateScene();
 
             if (currentState.Scene != GameScene.Play)
