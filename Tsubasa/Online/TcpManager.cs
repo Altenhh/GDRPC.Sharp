@@ -62,7 +62,10 @@ namespace Tsubasa.Online
 
                 if (bytesRead > 0)
                 {
-                    var response = Handle(rawData);
+                    byte[] _raw = new byte[bytesRead];
+                    Array.Copy(rawData, 0, _raw, 0, bytesRead);
+
+                    var response = Handle(_raw);
 
                     OnPacketRecieved(new PacketRecievedEventArgs()
                     {
@@ -86,7 +89,7 @@ namespace Tsubasa.Online
 
         private Packet Handle(byte[] rawData)
         {
-            return null;
+            return new Packet(rawData);
         }
 
         public Packet ReadNext()
@@ -125,7 +128,7 @@ namespace Tsubasa.Online
             _stream.Write(packed, 0, packed.Length);
         }
 
-        public void StartPacket(RequestId id)
+        public void StartPacket(PacketIds id)
         {
             buildPacket = new Packet { Id = (int) id };
         }

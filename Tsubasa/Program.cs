@@ -63,15 +63,6 @@ namespace Tsubasa
 
                 client = new TcpManager("207.244.229.86", 6967);
                 client.Connect();
-
-                client.StartPacket(RequestId.Ping);
-                client.EndPacket();
-                var res = client.ReadNext();
-
-                if (res.Id == (short) ResponseId.Ping)
-                {
-                    Write("Connected!", ConsoleColor.Green);
-                }
             }
             catch (Exception e)
             {
@@ -79,6 +70,19 @@ namespace Tsubasa
                 Write("Continuing without server...", ConsoleColor.Red);
 
                 throw;
+            }
+        }
+
+        private static void SendHeartBeat()
+        {
+            client.StartPacket(PacketIds.Ping);
+            client.EndPacket();
+            
+            var res = client.ReadNext();
+
+            if (res.Id == (short) PacketIds.Pong)
+            {
+                Write("Heartbeat successfully heard.");
             }
         }
 
@@ -111,15 +115,17 @@ namespace Tsubasa
             }
 
             var percent = Math.Round(state.PlayerState.X / state.LevelInfo.Length * 100, MidpointRounding.ToZero);
-            var lastPercent = Math.Round(last_died[state.LevelInfo.Id].Max() / state.LevelInfo.Length * 100, MidpointRounding.ToZero);
+
+            var lastPercent = Math.Round(last_died[state.LevelInfo.Id].Max() / state.LevelInfo.Length * 100,
+                MidpointRounding.ToZero);
 
             // new record
             if (percent > lastPercent)
             {
                 last_died[state.LevelInfo.Id].Add(state.PlayerState.X);
                 Write($"New record! {lastPercent}% -> {percent}%", ConsoleColor.Green);
-                
-                client.StartPacket(RequestId.SendScore);
+
+                client.StartPacket(PacketIds.SendScore);
                 client.WritePacket(state.LevelInfo.Id);
                 client.WritePacket(state.LevelInfo.CalculateScore());
                 client.WritePacket(state.LevelInfo.CalculatePerformance());
@@ -146,7 +152,10 @@ namespace Tsubasa
                 rpcScheduler.Add(UpdateCurrentState);
                 rpcScheduler.Add(UpdateRpcDisplay);
                 rpcScheduler.Add(rpc.Update);
+
+                // Even though this really doesn't belong here, it should stay here as to not overload the server with requests.
                 rpcScheduler.Add(ServerCheckLevelProgress);
+                rpcScheduler.Add(SendHeartBeat);
 
                 rpcScheduler.Pulse();
             };

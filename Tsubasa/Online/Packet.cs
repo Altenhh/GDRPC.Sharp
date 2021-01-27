@@ -158,10 +158,11 @@ namespace Tsubasa.Online
             {
                 int size = SizeOf<T>();
                 bytes = _reader.ReadBytes(size);
-
-                // cringe
-                Array.Reverse(bytes);
             }
+
+            // little endianer
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
 
             // add to offset
             return Transfer<T>(bytes);
