@@ -52,12 +52,8 @@ namespace Tsubasa.Information
             return (int)res;
         }
 
-        public double CalculatePerformance()
+        public float CalculatePerformance()
         {
-            Console.WriteLine("Difficulty: " + CalculateDifficulty());
-            Console.WriteLine("Score: " + CalculateScore());
-            Console.WriteLine("Length: " + Length);
-
             var res = Math.Pow(
                 Math.Pow(CalculateDifficulty() / 14d, 0.4d) * (CalculateScore() / 1_000_000d) *
                 Math.Pow(Length, CalculateDifficulty() / 25d), 1.2d);
@@ -72,13 +68,7 @@ namespace Tsubasa.Information
             else
                 attemptPenalty = Math.Pow(TotalAttempts, -((TotalAttempts * 0.85) / 1e7)) * 0.7; // everything else
 
-            Console.WriteLine("res: " + res);
-            Console.WriteLine("low: " + Math.Pow(TotalAttempts, -((TotalAttempts * 0.75) / 1e7)));
-            Console.WriteLine("high: " + Math.Pow(TotalAttempts, -((TotalAttempts * 0.85) / 1e7)) * 0.7);
-
             res *= attemptPenalty;
-
-            Console.WriteLine("total: " + res);
 
             if (CompletionProgress >= 100)
                 res *= 1.05f;
@@ -87,7 +77,7 @@ namespace Tsubasa.Information
                 if (coin)
                     res *= (.1 / MaxCoins) + 1; // should at least have 1.1 bonus max.
 
-            return res;
+            return (float) res;
         }
 
         public int CalculateDifficulty()

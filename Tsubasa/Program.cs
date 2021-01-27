@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using DiscordRPC;
@@ -17,13 +16,15 @@ namespace Tsubasa
     {
         private static Process gdProcess;
         private static GdReader reader;
-        private static readonly GdProcessState state = new GdProcessState();
+        private static readonly GdProcessState state = new();
         private static DiscordClient rpc;
-        private static Scheduler scheduler;
-        private static TcpClient client;
+        private static Scheduler rpcScheduler;
+        private static TcpManager client;
+        private static readonly MemoryStorage blacklist_ids = new();
+        private static readonly Dictionary<int, List<float>> last_died = new();
         private static bool successfulUpdate;
 
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             GetGdProcess(args);
 
@@ -36,64 +37,96 @@ namespace Tsubasa
 
             Hook();
             InitializeRpc();
-            await InitializeServer();
+            new Task(InitializeServer).Start();
 
             while (true)
             {
-                if (scheduler.Stopwatch.ElapsedMilliseconds < scheduler.Delay)
+                if (rpcScheduler.Stopwatch.ElapsedMilliseconds < rpcScheduler.Delay)
                     continue;
 
-                scheduler.Stopwatch.Restart();
-                scheduler.Pulse();
+                rpcScheduler.Stopwatch.Restart();
+                rpcScheduler.Pulse();
             }
         }
 
-        private static async Task InitializeServer()
+        #region Server
+        private static void InitializeServer()
         {
-            await ConnectToTcpServer();
-            SendTestPacket();
+            ConnectToTcpServer();
         }
 
-        private static async Task ConnectToTcpServer()
+        private static void ConnectToTcpServer()
         {
             try
             {
-                client = new TcpClient();
                 Write("Connecting to Tcp server...");
 
-                await client.ConnectAsync("207.244.229.86", 6967);
+                client = new TcpManager("207.244.229.86", 6967);
+                client.Connect();
 
-                Write("Connected!", ConsoleColor.Green);
+                client.StartPacket(RequestId.Ping);
+                client.EndPacket();
+                var res = client.ReadNext();
+
+                if (res.Id == (short) ResponseId.Ping)
+                {
+                    Write("Connected!", ConsoleColor.Green);
+                }
             }
             catch (Exception e)
             {
-                Write(e.Message, ConsoleColor.Red);
+                Write(e.ToString(), ConsoleColor.Red);
                 Write("Continuing without server...", ConsoleColor.Red);
+
+                throw;
             }
         }
 
-        private static void SendTestPacket()
+        private static void ServerCheckLevelProgress()
         {
-            if (client.Connected)
+            if (currentRpcScene.GetType() != typeof(PlayScene))
+                return;
+
+            // If the player is in practice, then just ignore the attempts.
+            if (state.PlayerState.IsPractice)
+                return;
+
+            // We've already completed the level before
+            if (blacklist_ids.Any(id => id == state.LevelInfo.Id))
+                return;
+
+            // We've already completed the level, so let's add it to our blacklist.
+            // TODO: Remove this code for the first few months of release, then later on release a "post score" method on the website.
+            if (state.LevelInfo.CompletionProgress == 100 && state.PlayerState.X < state.LevelInfo.Length)
+                blacklist_ids.Add(state.LevelInfo.Id);
+
+            // Let's check if the player is dead before continuing on.
+            if (!state.PlayerState.IsDead)
+                return;
+
+            if (!last_died.ContainsKey(state.LevelInfo.Id))
             {
-                var packet = new Packet();
-                var stream = client.GetStream();
-                var rng = new Random();
+                var points = new List<float> { 0 };
+                last_died.Add(state.LevelInfo.Id, points);
+            }
 
-                // set id
-                packet.Id = 10;
+            var percent = Math.Round(state.PlayerState.X / state.LevelInfo.Length * 100, MidpointRounding.ToZero);
+            var lastPercent = Math.Round(last_died[state.LevelInfo.Id].Max() / state.LevelInfo.Length * 100, MidpointRounding.ToZero);
 
-                for (int i = 0; i < 5; i++)
-                {
-                    packet.Write<int>(rng.Next(int.MaxValue));
-                }
-
-                // pack thing
-                var packedpacketedpacket = packet.Pack();
-
-                stream.Write(packedpacketedpacket, 0, packedpacketedpacket.Length);
+            // new record
+            if (percent > lastPercent)
+            {
+                last_died[state.LevelInfo.Id].Add(state.PlayerState.X);
+                Write($"New record! {lastPercent}% -> {percent}%", ConsoleColor.Green);
+                
+                client.StartPacket(RequestId.SendScore);
+                client.WritePacket(state.LevelInfo.Id);
+                client.WritePacket(state.LevelInfo.CalculateScore());
+                client.WritePacket(state.LevelInfo.CalculatePerformance());
+                client.EndPacket();
             }
         }
+        #endregion
 
         private static void Hook()
         {
@@ -106,15 +139,16 @@ namespace Tsubasa
             rpc = new DiscordClient();
             rpc.ChangeStatus(s => s.Assets = new Assets { LargeImageKey = "gd" });
 
-            scheduler = new Scheduler(2000);
+            rpcScheduler = new Scheduler(2000);
 
             rpc.OnReady += () =>
             {
-                scheduler.Add(UpdateCurrentState);
-                scheduler.Add(UpdateRpcDisplay);
-                scheduler.Add(rpc.Update);
+                rpcScheduler.Add(UpdateCurrentState);
+                rpcScheduler.Add(UpdateRpcDisplay);
+                rpcScheduler.Add(rpc.Update);
+                rpcScheduler.Add(ServerCheckLevelProgress);
 
-                scheduler.Pulse();
+                rpcScheduler.Pulse();
             };
         }
 
@@ -136,7 +170,7 @@ namespace Tsubasa
             else
                 // We're most definitely not in the correct scene, so let's just go back to the main menu presence.
                 currentRpcScene = new IdleScene(reader, rpc, state);
-            
+
             currentRpcScene.Pulse();
 
             static void GetNewRpcScene()
@@ -145,7 +179,7 @@ namespace Tsubasa
                 currentRpcScene.State = state;
                 currentRpcScene.Client = rpc;
                 currentRpcScene.Reader = reader;
-                
+
                 Write($"Switched scene to: {currentRpcScene.State.Scene}", ConsoleColor.Blue);
             }
         }

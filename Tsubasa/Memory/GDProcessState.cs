@@ -6,5 +6,6 @@ namespace Tsubasa.Memory
     {
         public GameScene Scene { get; set; }
         public LevelInfo LevelInfo { get; } = new LevelInfo();
+        public PlayerState PlayerState { get; set; } = new();
     }
 }

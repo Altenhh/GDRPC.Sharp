@@ -20,11 +20,9 @@ namespace Tsubasa.Online
         private BinaryWriter _writer;
 
         // some data we would use
-        public short Id;
+        public int Id;
         public int Length => _raw.Length;
-
         public int Offset = 0;
-
         public byte[] RawData => _raw;
 
         public Packet()
@@ -51,8 +49,8 @@ namespace Tsubasa.Online
             Id = Read<short>();
 
             // turn the raw data into data since the first few bytes are essentially useless 
-            _raw = new byte[rawData.Length - 2]; // negate first 2 bytes now
-            Array.Copy(rawData, 2, _raw, 0, rawData.Length - 2);
+            _raw = new byte[rawData.Length - 6]; // negate first 2 bytes now
+            Array.Copy(rawData, 6, _raw, 0, rawData.Length - 6);
 
             // reset the reader
             _reader = new BinaryReader(new MemoryStream(_raw));
@@ -76,7 +74,8 @@ namespace Tsubasa.Online
                 if (string.IsNullOrEmpty(dataString))
                 {
                     setter = new byte[] { 0 };
-                } else
+                }
+                else
                 {
                     setter = new byte[dataString.Length + (1 + length.Length)];
                     setter[0] = 0x0B; // set string indicator
@@ -113,7 +112,7 @@ namespace Tsubasa.Online
             Array.Copy(_raw, 0, res, 0, _raw.Length);
             // copy data to res
             Array.Copy(setter, 0, res, Offset, setter.Length);
-            
+
             Offset += setter.Length;
 
             // reset the reader
@@ -123,11 +122,12 @@ namespace Tsubasa.Online
 
         public byte[] Pack()
         {
-            byte[] res = new byte[_raw.Length + 2]; // ID + raw length
+            byte[] res = new byte[_raw.Length + 6]; // ID + raw length
 
             // copy data to response
             Array.Copy(BitConverter.GetBytes(Id), 0, res, 0, 2); // copy id
-            Array.Copy(_raw, 0, res, 2, _raw.Length); // copy raw data
+            Array.Copy(BitConverter.GetBytes(Length), 0, res, 2, 4); // copy length
+            Array.Copy(_raw, 0, res, 6, _raw.Length); // copy raw data
 
             return res;
         }
@@ -170,7 +170,7 @@ namespace Tsubasa.Online
         public static int SizeOf<T>()
         {
             Type type = typeof(T);
-            
+
             return Marshal.SizeOf(type);
         }
 

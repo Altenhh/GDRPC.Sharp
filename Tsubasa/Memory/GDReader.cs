@@ -101,6 +101,10 @@ namespace Tsubasa.Memory
             currentState.LevelInfo.Length = Read<float>("Level Length");
 
             currentState.LevelInfo.Type = (LevelType) Read<int>("Level Type");
+
+            currentState.PlayerState.X = Read<float>("Player X");
+            currentState.PlayerState.IsDead = Read<bool>("Player Dead");
+            currentState.PlayerState.IsPractice = Read<bool>("Practice Mode");
         }
 
         private T Read<T>(string addressEntryName)

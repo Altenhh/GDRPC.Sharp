@@ -81,3 +81,15 @@ valueType: int
 [Level Length]
 offsets: 0x164 | 0x3B4
 valueType: float
+
+[Player X]
+offsets: 0x164 | 0x224 | 0x34
+valueType: float
+
+[Player Dead]
+offsets: 0x164 | 0x39c
+valueType: bool
+
+[Practice Mode]
+offsets: 0x164 | 0x495
+valueType: bool
