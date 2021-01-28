@@ -93,3 +93,11 @@ valueType: bool
 [Practice Mode]
 offsets: 0x164 | 0x495
 valueType: bool
+
+[Account ID]
+offsets: 0x120
+valueType: int
+
+[User ID]
+offsets: 0x1BC
+valueType: int

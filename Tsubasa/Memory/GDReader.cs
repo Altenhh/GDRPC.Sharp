@@ -9,13 +9,15 @@ namespace Tsubasa.Memory
 {
     public class GdReader
     {
-        public const int BaseAddress = 0x3222D0;
+        public const int GAME_MANAGER_ADDRESS = 0x3222D0;
+        public const int ACCOUNT_MANAGER_ADDRESS = 0x3222D8;
         public GdProcessState PreviousState;
         private static readonly AddressDictionary addresses;
         public readonly Process Process;
         private readonly GdProcessState currentState;
         private readonly ProcessMemory memory;
-        private readonly IntPtr processBaseAddress;
+        private readonly IntPtr gameManager;
+        private readonly IntPtr accountManager;
 
         static GdReader()
         {
@@ -26,15 +28,21 @@ namespace Tsubasa.Memory
         {
             memory = new ProcessMemory(Process = process);
             currentState = state;
-            processBaseAddress = memory.Read<IntPtr>((IntPtr) BaseAddress, true);
+            gameManager = memory.Read<IntPtr>((IntPtr) GAME_MANAGER_ADDRESS, true);
+            accountManager = memory.Read<IntPtr>((IntPtr) ACCOUNT_MANAGER_ADDRESS, true);
         }
 
-        public bool IsInEditor => Read<bool>(0x0);
+        public bool IsInEditor => Read<bool>(gameManager, 0x0);
 
         public void UpdateScene()
         {
             // Cannot directly read enum types
             currentState.Scene = (GameScene) Read<int>("Current Scene");
+            
+            currentState.PlayerState.UserId = Read<int>("User ID");
+            
+            // This one is special, we have to read from the account manager instead.
+            currentState.PlayerState.AccountId = Read<int>("Account ID", accountManager);
         }
 
         /// <summary>Updates the current GD process state in the locally stored <seealso cref="GdProcessState" /> object. It also calls the <seealso cref="UpdateScene" /> function.</summary>
@@ -112,27 +120,40 @@ namespace Tsubasa.Memory
         {
             return Read<T>(addresses[addressEntryName]);
         }
+        
+        private T Read<T>(string addressEntryName, IntPtr baseAddress)
+            where T : struct
+        {
+            return Read<T>(addresses[addressEntryName], baseAddress);
+        }
 
         private T Read<T>(AddressEntry entry)
             where T : struct
         {
             // TODO: Utilize the type of the entry
-            return Read<T>(entry.Offsets);
+            return Read<T>(gameManager, entry.Offsets);
         }
-
-        private T Read<T>(params int[] offsets)
+        
+        private T Read<T>(AddressEntry entry, IntPtr baseAddress)
             where T : struct
         {
-            var address = ForwardAddress(processBaseAddress, offsets);
+            // TODO: Utilize the type of the entry
+            return Read<T>(baseAddress, entry.Offsets);
+        }
+
+        private T Read<T>(IntPtr baseAddress, params int[] offsets)
+            where T : struct
+        {
+            var address = ForwardAddress(baseAddress, offsets);
 
             return memory.Read<T>(address + offsets[^1], false);
         }
 
-        private string ReadString(string addressEntryName) => ReadString(addresses[addressEntryName]);
+        private string ReadString(string addressEntryName) => ReadString(gameManager, addresses[addressEntryName]);
 
-        private string ReadString(AddressEntry entry)
+        private string ReadString(IntPtr baseAddress, AddressEntry entry)
         {
-            var address = ForwardAddress(processBaseAddress, entry.Offsets);
+            var address = ForwardAddress(baseAddress, entry.Offsets);
 
             return memory.ReadString(address + entry.Offsets[^1], Encoding.Default, false);
         }

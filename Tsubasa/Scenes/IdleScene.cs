@@ -6,7 +6,7 @@ namespace Tsubasa.Scenes
 {
     public class IdleScene : RpcScene
     {
-        public override IEnumerable<GameScene> Scenes => new[] { GameScene.MainMenu };
+        public override IEnumerable<GameScene> Scenes => new[] { GameScene.MainMenu, GameScene.Online };
 
         public IdleScene()
             : base()

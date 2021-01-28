@@ -127,6 +127,8 @@ namespace Tsubasa
 
                 client.StartPacket(PacketIds.SendScore);
                 client.WritePacket(state.LevelInfo.Id);
+                client.WritePacket(state.PlayerState.UserId);
+                client.WritePacket(state.PlayerState.AccountId);
                 client.WritePacket(state.LevelInfo.CalculateScore());
                 client.WritePacket(state.LevelInfo.CalculatePerformance());
                 client.EndPacket();
@@ -155,7 +157,7 @@ namespace Tsubasa
 
                 // Even though this really doesn't belong here, it should stay here as to not overload the server with requests.
                 rpcScheduler.Add(ServerCheckLevelProgress);
-                rpcScheduler.Add(SendHeartBeat);
+                //rpcScheduler.Add(SendHeartBeat);
 
                 rpcScheduler.Pulse();
             };
