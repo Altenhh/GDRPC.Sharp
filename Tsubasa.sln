@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tsubasa", "Tsubasa\Tsubasa.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tsubasa.Tests", "Tsubasa.Tests\Tsubasa.Tests.csproj", "{5FCB0F11-1494-4A11-8A99-A0ADB7453DB6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tsubasa.Forms", "Tsubasa.Forms\Tsubasa.Forms.csproj", "{229B0571-17F0-4280-84A2-20C2DCE0BC62}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -21,6 +23,10 @@ Global
 		{5FCB0F11-1494-4A11-8A99-A0ADB7453DB6}.Debug|x86.Build.0 = Debug|Any CPU
 		{5FCB0F11-1494-4A11-8A99-A0ADB7453DB6}.Release|x86.ActiveCfg = Release|Any CPU
 		{5FCB0F11-1494-4A11-8A99-A0ADB7453DB6}.Release|x86.Build.0 = Release|Any CPU
+		{229B0571-17F0-4280-84A2-20C2DCE0BC62}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{229B0571-17F0-4280-84A2-20C2DCE0BC62}.Debug|x86.Build.0 = Debug|Any CPU
+		{229B0571-17F0-4280-84A2-20C2DCE0BC62}.Release|x86.ActiveCfg = Release|Any CPU
+		{229B0571-17F0-4280-84A2-20C2DCE0BC62}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
