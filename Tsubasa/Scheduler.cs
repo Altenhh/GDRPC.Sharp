@@ -9,11 +9,13 @@ namespace Tsubasa
     {
         private readonly Queue<Action> runQueue = new Queue<Action>();
         public int Delay;
+        public string name;
         public Stopwatch Stopwatch = new Stopwatch();
 
-        public Scheduler(int delay)
+        public Scheduler(int delay, string name)
         {
             Delay = delay;
+            this.name = name;
         }
 
         public void Pulse()
@@ -22,7 +24,7 @@ namespace Tsubasa
                 Stopwatch.Start();
 
             Stopwatch.Restart();
-            Write($"Executing {runQueue.Count} tasks.", ConsoleColor.Yellow);
+            Write($"[{name}] Executing {runQueue.Count} tasks.", ConsoleColor.Yellow);
 
             foreach (var action in runQueue)
                 action();

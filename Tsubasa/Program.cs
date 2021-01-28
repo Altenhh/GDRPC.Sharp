@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DiscordRPC;
 using Tsubasa.Memory;
 using Tsubasa.Online;
+using Tsubasa.Online.Tcp;
 using Tsubasa.Scenes;
 using static Tsubasa.Helper;
 
@@ -19,6 +20,7 @@ namespace Tsubasa
         private static readonly GdProcessState state = new();
         private static DiscordClient rpc;
         private static Scheduler rpcScheduler;
+        private static Scheduler serverScheduler;
         private static TcpManager client;
         private static readonly MemoryStorage blacklist_ids = new();
         private static readonly Dictionary<int, List<float>> last_died = new();
@@ -35,17 +37,35 @@ namespace Tsubasa
                 return;
             }
 
-            Hook();
-            InitializeRpc();
-            new Task(InitializeServer).Start();
+            // Parallel Threads
+            Parallel.Invoke(
+                // RPC Thread
+                () =>
+                {
 
+                    Hook();
+                    InitializeRpc();
+
+                    CreateLoop(rpcScheduler);
+                },
+                // TCP Thread
+                () =>
+                {
+                    new Task(InitializeServer).Start();
+                    CreateLoop(serverScheduler);
+                }
+            );
+        }
+
+        private static void CreateLoop(Scheduler scheduler)
+        {
             while (true)
             {
-                if (rpcScheduler.Stopwatch.ElapsedMilliseconds < rpcScheduler.Delay)
+                if (scheduler.Stopwatch.ElapsedMilliseconds < scheduler.Delay)
                     continue;
 
-                rpcScheduler.Stopwatch.Restart();
-                rpcScheduler.Pulse();
+                scheduler.Stopwatch.Restart();
+                scheduler.Pulse();
             }
         }
 
@@ -63,6 +83,15 @@ namespace Tsubasa
 
                 client = new TcpManager("207.244.229.86", 6967);
                 client.Connect();
+
+                serverScheduler = new Scheduler(10000, "server");
+                serverScheduler.Add(SendHeartBeat);
+
+                // kickstart reading
+                client.PacketRecieved += HandlePacket;
+
+                // subscribe to stream
+                client.Subscribe();
             }
             catch (Exception e)
             {
@@ -71,6 +100,11 @@ namespace Tsubasa
 
                 throw;
             }
+        }
+
+        private static void HandlePacket(object sender, PacketRecievedEventArgs e)
+        {
+            
         }
 
         private static void SendHeartBeat()
@@ -83,6 +117,10 @@ namespace Tsubasa
             if (res.Id == (short) PacketIds.Pong)
             {
                 Write("Heartbeat successfully heard.");
+            }
+            else
+            {
+                Write("Heartbeat not heard.", ConsoleColor.Red);
             }
         }
 
@@ -125,13 +163,13 @@ namespace Tsubasa
                 last_died[state.LevelInfo.Id].Add(state.PlayerState.X);
                 Write($"New record! {lastPercent}% -> {percent}%", ConsoleColor.Green);
 
-                client.StartPacket(PacketIds.SendScore);
-                client.WritePacket(state.LevelInfo.Id);
-                client.WritePacket(state.PlayerState.UserId);
-                client.WritePacket(state.PlayerState.AccountId);
-                client.WritePacket(state.LevelInfo.CalculateScore());
-                client.WritePacket(state.LevelInfo.CalculatePerformance());
-                client.EndPacket();
+                //client.StartPacket(PacketIds.SendScore);
+                //client.WritePacket(state.LevelInfo.Id);
+                //client.WritePacket(state.PlayerState.UserId);
+                //client.WritePacket(state.PlayerState.AccountId);
+                //client.WritePacket(state.LevelInfo.CalculateScore());
+                //client.WritePacket(state.LevelInfo.CalculatePerformance());
+                //client.EndPacket();
             }
         }
         #endregion
@@ -147,7 +185,7 @@ namespace Tsubasa
             rpc = new DiscordClient();
             rpc.ChangeStatus(s => s.Assets = new Assets { LargeImageKey = "gd" });
 
-            rpcScheduler = new Scheduler(2000);
+            rpcScheduler = new Scheduler(2000, "rpc");
 
             rpc.OnReady += () =>
             {

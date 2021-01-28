@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using Tsubasa.Online.Tcp;
 
 namespace Tsubasa.Online
 {
     public class TcpManager : IDisposable
     {
-        public const int MAX_PACKET_SIZE = 1024;
         private readonly TcpClient _client = new TcpClient();
         private NetworkStream _stream;
+        private bool InternallyDisconnected = false;
+        private Packet buildPacket;
+
+        public const int MAX_PACKET_SIZE = 1024;
         public string Hostname { get; set; }
         public int Port { get; set; }
         public bool Connected => _client.Connected;
         public bool Closed { get; set; }
-
-        private Packet buildPacket;
+        public bool Subscribed { get; set; }
+        public bool AutoReconnect = true;
 
         public TcpManager(string hostname, int port)
         {
@@ -50,46 +54,79 @@ namespace Tsubasa.Online
             return TcpCloseReason.User;
         }
 
-        public void Read()
+        public void Subscribe()
         {
             if (!Connected)
                 Connect();
 
+            Subscribed = true;
+
             while (true)
             {
-                byte[] rawData = new byte[MAX_PACKET_SIZE];
-                int bytesRead = _stream.Read(rawData, 0, rawData.Length);
-
-                if (bytesRead > 0)
+                try
                 {
-                    byte[] _raw = new byte[bytesRead];
-                    Array.Copy(rawData, 0, _raw, 0, bytesRead);
-
-                    var response = Handle(_raw);
-
-                    OnPacketRecieved(new PacketRecievedEventArgs()
+                    if (InternallyDisconnected)
                     {
-                        Packet = response
-                    });
+                        Subscribed = false;
 
-                    rawData = new byte[MAX_PACKET_SIZE]; // reset raw data
-                }
-
-                if (!Connected)
-                {
-                    if (!Closed)
-                    {
-                        OnDisconnect(TcpCloseReason.Server);
+                        break;
                     }
 
-                    break;
+                    if (!Connected)
+                    {
+                        if (!Closed)
+                        {
+                            OnDisconnect(TcpCloseReason.Server);
+                        }
+
+                        Subscribed = false;
+
+                        break;
+                    }
+
+                    byte[] rawData = new byte[MAX_PACKET_SIZE];
+                    int bytesRead = _stream.Read(rawData, 0, rawData.Length);
+
+                    if (bytesRead > 0)
+                    {
+                        byte[] _raw = new byte[bytesRead];
+                        Array.Copy(rawData, 0, _raw, 0, bytesRead);
+
+                        var response = Handle(_raw);
+
+                        OnPacketRecieved(new PacketRecievedEventArgs()
+                        {
+                            Packet = response
+                        });
+
+                        rawData = new byte[MAX_PACKET_SIZE]; // reset raw data
+                    }
+                }
+                catch (Exception _)
+                {
+                    // thread's dead, try reconencting if we want to
+                    if (!AutoReconnect)
+                    {
+                        break;
+                    }
+
+                    // sleep for 5s
+                    Thread.Sleep(5000);
+
+                    // reconnect
+                    Connect();
                 }
             }
         }
 
+        public void Unsubscribe()
+        {
+            InternallyDisconnected = true; // disconnect the subscribe functions automatically
+        }
+
         private Packet Handle(byte[] rawData)
         {
-            return new Packet(rawData);
+            return new(rawData);
         }
 
         public Packet ReadNext()
@@ -169,6 +206,7 @@ namespace Tsubasa.Online
 
         protected virtual void OnDisconnect(TcpCloseReason reason)
         {
+            InternallyDisconnected = true;
             Disconnect?.Invoke(this, reason);
         }
 
