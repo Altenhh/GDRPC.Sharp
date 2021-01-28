@@ -122,24 +122,16 @@ namespace Tsubasa.Memory
         }
         
         private T Read<T>(string addressEntryName, IntPtr baseAddress)
-            where T : struct
-        {
-            return Read<T>(addresses[addressEntryName], baseAddress);
-        }
+            where T : struct =>
+            Read<T>(addresses[addressEntryName], baseAddress);
 
         private T Read<T>(AddressEntry entry)
-            where T : struct
-        {
-            // TODO: Utilize the type of the entry
-            return Read<T>(gameManager, entry.Offsets);
-        }
-        
+            where T : struct =>
+            Read<T>(gameManager, entry.Offsets);
+
         private T Read<T>(AddressEntry entry, IntPtr baseAddress)
-            where T : struct
-        {
-            // TODO: Utilize the type of the entry
-            return Read<T>(baseAddress, entry.Offsets);
-        }
+            where T : struct =>
+            Read<T>(baseAddress, entry.Offsets);
 
         private T Read<T>(IntPtr baseAddress, params int[] offsets)
             where T : struct
