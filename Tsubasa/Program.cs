@@ -15,6 +15,8 @@ namespace Tsubasa
 {
     public static class Program
     {
+        public const string CONFIG_VERSION = "1.0";
+        
         private static Process gdProcess;
         private static GdReader reader;
         private static readonly GdProcessState state = new();
@@ -42,7 +44,6 @@ namespace Tsubasa
                 // RPC Thread
                 () =>
                 {
-
                     Hook();
                     InitializeRpc();
 
@@ -72,7 +73,12 @@ namespace Tsubasa
         #region Server
         private static void InitializeServer()
         {
+            InitializeLocalDatabase();
             ConnectToTcpServer();
+        }
+
+        private static void InitializeLocalDatabase()
+        {
         }
 
         private static void ConnectToTcpServer()
@@ -104,14 +110,13 @@ namespace Tsubasa
 
         private static void HandlePacket(object sender, PacketRecievedEventArgs e)
         {
-            
         }
 
         private static void SendHeartBeat()
         {
             client.StartPacket(PacketIds.Ping);
             client.EndPacket();
-            
+
             var res = client.ReadNext();
 
             if (res.Id == (short) PacketIds.Pong)
