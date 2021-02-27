@@ -54,6 +54,10 @@ namespace Tsubasa.Scenes
 
         public abstract void Pulse();
 
+        public virtual void Dispose()
+        {
+        }
+
         public static RpcScene GetScene(GameScene scene) => GetScene(scene.ToFlags());
         public static RpcScene GetScene(GameScenes scene)
         {

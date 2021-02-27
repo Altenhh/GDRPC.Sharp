@@ -16,7 +16,6 @@ namespace Tsubasa
     public static class Program
     {
         public const string CONFIG_VERSION = "1.0";
-        
         private static Process gdProcess;
         private static GdReader reader;
         private static readonly GdProcessState state = new();
@@ -219,6 +218,8 @@ namespace Tsubasa
 
         private static void UpdateRpcDisplay()
         {
+            currentRpcScene.Dispose();
+
             if (successfulUpdate)
                 GetNewRpcScene();
             else

@@ -60,7 +60,7 @@ namespace Tsubasa.Information
 
             if (CompletionProgress >= 100)
                 res *= 1.05f;
-            
+
             foreach (var coin in CoinsGrabbed)
                 if (coin)
                     res *= (.1 / MaxCoins) + 1; // should at least have 1.1 bonus max.*/
@@ -68,7 +68,7 @@ namespace Tsubasa.Information
             if (Demon)
                 res += Math.Pow(DemonDifficulty * (CompletionProgress / 100), 1.1f);
             else
-                res += 1 + (1 / Difficulty);
+                res += 1 + (1 / (Difficulty == 0 ? 1 : Difficulty));
 
             /*// uniformly calculate difficulty bonus
             res *= Math.Pow(CalculateDifficulty(), (Stars * 0.95) / 1e7);
@@ -91,7 +91,7 @@ namespace Tsubasa.Information
         public double CalculateDifficulty()
         {
             double diff = Stars;
-            
+
             if (Auto)
                 return 0;
 

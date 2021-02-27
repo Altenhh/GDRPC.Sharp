@@ -7,7 +7,8 @@ namespace Tsubasa.Scenes
 {
     public class PlayScene : RpcScene
     {
-        public override IEnumerable<GameScene> Scenes => new[] { GameScene.Play, GameScene.TheChallenge, GameScene.OfficialLevel };
+        public override IEnumerable<GameScene> Scenes =>
+            new[] { GameScene.Play, GameScene.TheChallenge, GameScene.OfficialLevel };
 
         public PlayScene()
             : base()
@@ -31,6 +32,28 @@ namespace Tsubasa.Scenes
             Client.ChangeStatus(s =>
                 s.State =
                     $"{info.CompletionProgress}% | {GetCoinString()} Score: {info.CalculateScore():N0} ({info.CalculatePerformance():N} pp)");
+            
+            Client.ChangeStatus(s =>
+            {
+                s.Buttons = new[]
+                {
+                    new Button
+                    {
+                        Label = "Level page",
+                        Url = $"https://gdbrowser.com/{State.LevelInfo.Id}"
+                    }
+                };
+            });
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            
+            Client.ChangeStatus(s =>
+            {
+                s.Buttons = null;
+            });
         }
 
         private string GetCoinString()

@@ -12,10 +12,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
     <PackageReference Include="MemorySharp" Version="1.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Tsubasa.Forms\Tsubasa.Forms.csproj" />
+    <Reference Include="DiscordRPC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>DiscordRPC.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
