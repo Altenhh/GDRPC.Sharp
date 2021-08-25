@@ -14,7 +14,7 @@ namespace Tsubasa.Online.Tcp
             this.packet = packet;
         }
 
-        public abstract void Handle();
+        public abstract void Handle(Packet packet);
 
         public static void Construct(Packet packet)
         {
@@ -23,19 +23,9 @@ namespace Tsubasa.Online.Tcp
                .GetTypes()
                .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(Handler)))
                .Select(t => (Handler) Activator.CreateInstance(t, packet))
-               .FirstOrDefault(h => h.Id == (PacketIds) packet.Id);
+               .FirstOrDefault(h => h != null && h.Id == (PacketIds) packet.Id);
 
-            var handlers = Assembly.GetExecutingAssembly()
-               .GetTypes()
-               .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(Handler)))
-               .Select(t => (Handler) Activator.CreateInstance(t, packet));
-            
-            foreach (var type in handlers)
-            {
-                Console.WriteLine(type.Id);
-            }
-
-            handler?.Handle();
+            handler?.Handle(packet);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Tsubasa
                 Stopwatch.Start();
 
             Stopwatch.Restart();
-            Write($"[{name}] Executing {runQueue.Count} tasks.", ConsoleColor.Yellow);
+            Write($"[scheduler] Executing {runQueue.Count} tasks for \"{name}\".");
 
             foreach (var action in runQueue)
                 action();

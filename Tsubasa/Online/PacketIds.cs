@@ -8,5 +8,7 @@
         Disconnection = 4, // SERVER
         Login = 5, // CLIENT
         SwitchAction = 6, // CLIENT
+        SendScore = 7, // CLIENT
+        ConnectionEstablished = 8 // SERVER
     }
 }

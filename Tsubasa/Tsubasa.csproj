@@ -20,4 +20,9 @@
       <HintPath>DiscordRPC.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Information\LevelInfo_Calculator.cs">
+      <DependentUpon>LevelInfo.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

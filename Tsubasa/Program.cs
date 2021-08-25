@@ -26,6 +26,7 @@ namespace Tsubasa
         private static readonly MemoryStorage blacklist_ids = new();
         private static readonly Dictionary<int, List<float>> last_died = new();
         private static bool successfulUpdate;
+        private static bool authenticated;
 
         public static void Main(string[] args)
         {
@@ -33,7 +34,7 @@ namespace Tsubasa
 
             if (gdProcess == null)
             {
-                Write("Failed to hook onto process", ConsoleColor.Red);
+                Write("[hooker] Failed to hook onto process");
 
                 return;
             }
@@ -51,8 +52,8 @@ namespace Tsubasa
                 // TCP Thread
                 () =>
                 {
-                    new Task(InitializeServer).Start();
-                    CreateLoop(serverScheduler);
+                   InitializeServer();
+                   new Thread(() => CreateLoop(serverScheduler)).Start();
                 }
             );
         }
@@ -84,48 +85,43 @@ namespace Tsubasa
         {
             try
             {
-                Write("Connecting to Tcp server...");
+                Write("[tcp] Connecting to Tcp server...");
 
-                client = new TcpManager("207.244.229.86", 6967);
+                client = new TcpManager("159.203.21.142", 6967);
                 client.Connect();
 
-                serverScheduler = new Scheduler(10000, "server");
+                serverScheduler = new Scheduler(5000, "tcp");
                 serverScheduler.Add(SendHeartBeat);
 
                 // kickstart reading
-                client.PacketRecieved += HandlePacket;
+                client.PacketRecieved += (_, e) => Handler.Construct(e.Packet);
+                
+                LoginToServer();
+                serverScheduler.Pulse();
 
                 // subscribe to stream
-                client.Subscribe();
+                new Thread(() => client.Subscribe()).Start();
             }
             catch (Exception e)
             {
-                Write(e.ToString(), ConsoleColor.Red);
-                Write("Continuing without server...", ConsoleColor.Red);
+                Write("[tcp]" + e);
+                Write("[tcp] Continuing without server...");
 
                 throw;
             }
         }
 
-        private static void HandlePacket(object sender, PacketRecievedEventArgs e)
+        private static void LoginToServer()
         {
+            client.StartPacket(PacketIds.Login);
+            //TODO: Add login information here.
+            client.EndPacket();
         }
 
         private static void SendHeartBeat()
         {
             client.StartPacket(PacketIds.Ping);
             client.EndPacket();
-
-            var res = client.ReadNext();
-
-            if (res.Id == (short) PacketIds.Pong)
-            {
-                Write("Heartbeat successfully heard.");
-            }
-            else
-            {
-                Write("Heartbeat not heard.", ConsoleColor.Red);
-            }
         }
 
         private static void ServerCheckLevelProgress()
@@ -142,7 +138,6 @@ namespace Tsubasa
                 return;
 
             // We've already completed the level, so let's add it to our blacklist.
-            // TODO: Remove this code for the first few months of release, then later on release a "post score" method on the website.
             if (state.LevelInfo.CompletionProgress == 100 && state.PlayerState.X < state.LevelInfo.Length)
                 blacklist_ids.Add(state.LevelInfo.Id);
 
@@ -165,7 +160,7 @@ namespace Tsubasa
             if (percent > lastPercent)
             {
                 last_died[state.LevelInfo.Id].Add(state.PlayerState.X);
-                Write($"New record! {lastPercent}% -> {percent}%", ConsoleColor.Green);
+                Write($"[hooker] New record! {lastPercent}% -> {percent}%");
 
                 //client.StartPacket(PacketIds.SendScore);
                 //client.WritePacket(state.LevelInfo.Id);
@@ -173,6 +168,7 @@ namespace Tsubasa
                 //client.WritePacket(state.PlayerState.AccountId);
                 //client.WritePacket(state.LevelInfo.CalculateScore());
                 //client.WritePacket(state.LevelInfo.CalculatePerformance());
+                //client.WritePacket((state.PlayerState.X / state.LevelInfo.Length) * 100); // More accurate percentage.
                 //client.EndPacket();
             }
         }
@@ -181,7 +177,7 @@ namespace Tsubasa
         private static void Hook()
         {
             reader = new GdReader(gdProcess, state);
-            Write($"Hooked onto process: {gdProcess.MainWindowTitle} ({gdProcess.Id})");
+            Write($"[hooker] Hooked onto process: {gdProcess.MainWindowTitle} ({gdProcess.Id})");
         }
 
         private static void InitializeRpc()
@@ -197,9 +193,8 @@ namespace Tsubasa
                 rpcScheduler.Add(UpdateRpcDisplay);
                 rpcScheduler.Add(rpc.Update);
 
-                // Even though this really doesn't belong here, it should stay here as to not overload the server with requests.
+                // We want to constantly check the level progress in-line with the RPC, since the RPC has more up-to-date information than the servers.
                 rpcScheduler.Add(ServerCheckLevelProgress);
-                //rpcScheduler.Add(SendHeartBeat);
 
                 rpcScheduler.Pulse();
             };
@@ -235,7 +230,7 @@ namespace Tsubasa
                 currentRpcScene.Client = rpc;
                 currentRpcScene.Reader = reader;
 
-                Write($"Switched scene to: {currentRpcScene.State.Scene}", ConsoleColor.Blue);
+                Write($"[hooker] Switched scene to: {currentRpcScene.State.Scene}");
             }
         }
 

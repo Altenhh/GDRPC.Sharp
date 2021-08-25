@@ -22,7 +22,7 @@ namespace Tsubasa
 
             client.OnConnectionFailed += (_, __) => client.Deinitialize();
 
-            client.OnError += (_, e) => Write($"An error occurred with Discord RPC Client: {e.Code} {e.Message}");
+            client.OnError += (_, e) => Write($"[rpc] An error occurred with Discord RPC Client: {e.Code} {e.Message}");
 
             client.Initialize();
         }
@@ -46,7 +46,7 @@ namespace Tsubasa
 
         private void onReady(object _, ReadyMessage __)
         {
-            Write("Discord RPC Client ready.");
+            Write("[rpc] Discord RPC Client ready.");
 
             OnReady?.Invoke();
             client.SetPresence(presence);

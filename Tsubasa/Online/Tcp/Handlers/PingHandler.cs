@@ -1,5 +1,4 @@
-﻿using System;
-using static Tsubasa.Helper;
+﻿using static Tsubasa.Helper;
 
 namespace Tsubasa.Online.Tcp.Handlers
 {
@@ -12,9 +11,9 @@ namespace Tsubasa.Online.Tcp.Handlers
 
         public override PacketIds Id => PacketIds.Pong;
 
-        public override void Handle()
+        public override void Handle(Packet packet)
         {
-            Write("Heartbeat successfully heard.", ConsoleColor.Green);
+            Write("[tcp] Heartbeat successfully heard.");
         }
     }
 }
